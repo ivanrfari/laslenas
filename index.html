@@ -176,6 +176,7 @@ html, body {
   border-radius: var(--r-inner);
   font-size: 14px; line-height: 1.5;
   font-weight: 500;
+  transition: all 0.3s ease;
 }
 .rh-detail-box.warn   { background: linear-gradient(135deg, #fef7e0 0%, #fffbf0 100%); color: #663c00; border-left: 4px solid #f29900; }
 .rh-detail-box.danger { background: linear-gradient(135deg, #fce8e6 0%, #fff5f5 100%); color: #66120e; border-left: 4px solid #d93025; }
@@ -190,7 +191,7 @@ html, body {
   box-shadow: var(--shadow);
   padding: 16px;
 }
-/* Clima Actual (Nuevo) */
+/* Clima Actual */
 .wx-current {
   display: flex; align-items: center; justify-content: flex-start;
   padding-bottom: 14px; margin-bottom: 10px;
@@ -324,12 +325,12 @@ html, body {
               <div class="rh-sub">Malargüe → Las Leñas · Km 0 al 48</div>
             </div>
           </div>
-          <span class="chip warn" id="chip-222">⚠ Cadenas</span>
+          <span class="chip warn" id="chip-222">...</span>
         </div>
         
         <div class="rh-detail-box warn" id="box-222">
           <span class="info-icon">ℹ️</span>
-          <span id="txt-222">Transitable con portación de cadenas obligatoria. Verificá las condiciones en tiempo real antes de salir.</span>
+          <span id="txt-222">Sincronizando estado oficial con Vialidad...</span>
         </div>
       </div>
     </div>
@@ -394,7 +395,6 @@ html, body {
 </div><!-- /app -->
 
 <script>
-// Función para armar la hora de actualización
 function setTime() {
   const n = new Date();
   const h = String(n.getHours()).padStart(2,'0');
@@ -403,23 +403,87 @@ function setTime() {
   document.getElementById('utime').textContent = `${h}:${m} · ${d}`;
 }
 
-// Función del botón de refresh (girar ícono)
 function refresh() {
   const ic = document.getElementById('rf-icon');
   ic.classList.add('spinning');
-  loadWeather(); // Recarga también el clima
+  
+  // Ejecutamos ambas actualizaciones en simultáneo
+  loadWeather(); 
+  loadRouteStatus();
+  
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 750);
 }
 
-// Función nativa para cargar el clima desde Open-Meteo
+// NUEVA FUNCIÓN: Web Scraping del estado de la RP 222
+async function loadRouteStatus() {
+  const chip = document.getElementById('chip-222');
+  const box = document.getElementById('box-222');
+  const txt = document.getElementById('txt-222');
+
+  try {
+    // Usamos AllOrigins como proxy gratuito para saltar el bloqueo CORS
+    const url = 'https://prensa.mendoza.gob.ar/estado-de-las-rutas-en-mendoza-2/';
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    
+    // Convertimos el HTML recibido en un formato que podamos escanear
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(data.contents, 'text/html');
+    
+    // Escaneamos todos los textos de la página oficial
+    const elements = doc.querySelectorAll('p, li, div, span, strong');
+    let statusText = null;
+
+    // Buscamos específicamente información de la ruta 222
+    for (const el of elements) {
+      const text = el.innerText.trim();
+      const upper = text.toUpperCase();
+      if ((upper.includes('RP 222') || upper.includes('RUTA 222') || upper.includes('RP222')) && text.length > 15) {
+        statusText = text;
+        break; // Detenemos la búsqueda al encontrar el primer acierto
+      }
+    }
+
+    if (statusText) {
+      txt.textContent = statusText;
+      const upperText = statusText.toUpperCase();
+      
+      // Lógica de colores automáticos según las palabras del reporte
+      if (upperText.includes('CORTAD') || upperText.includes('INTRANSITABLE') || upperText.includes('CERRAD')) {
+        chip.className = 'chip danger';
+        chip.textContent = '🚫 Cerrada';
+        box.className = 'rh-detail-box danger';
+      } else if (upperText.includes('CADENAS') || upperText.includes('PRECAUCI') || upperText.includes('HIELO')) {
+        chip.className = 'chip warn';
+        chip.textContent = '⚠ Cadenas';
+        box.className = 'rh-detail-box warn';
+      } else {
+        chip.className = 'chip ok';
+        chip.textContent = '✅ Transitable';
+        box.className = 'rh-detail-box ok';
+      }
+    } else {
+       txt.textContent = "No se encontró el estado de la RP 222 en el último reporte. Tocá el enlace oficial para revisar manualmente.";
+       chip.className = 'chip warn';
+       chip.textContent = '⚠ Sin datos';
+       box.className = 'rh-detail-box warn';
+    }
+  } catch(e) {
+    txt.textContent = "Error al conectar con la web de Vialidad. Revisá el enlace oficial abajo.";
+    chip.className = 'chip warn';
+    chip.textContent = '⚠ Error';
+  }
+}
+
+// Función del clima (Mantenida igual)
 async function loadWeather() {
   const container = document.getElementById('wx-container');
   try {
-    // Se agregó 'current=temperature_2m,weather_code' para el clima en tiempo real
     const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
     const data = await res.json();
     
-    // Diccionario de códigos meteorológicos a Emojis
     const codes = {
       0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️',
       51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️',
@@ -427,11 +491,9 @@ async function loadWeather() {
       85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️'
     };
 
-    // Datos del clima actual
     const currentTemp = Math.round(data.current.temperature_2m);
     const currentIcon = codes[data.current.weather_code] || '⛅';
 
-    // Construcción del HTML
     let html = `
       <div class="wx-current">
         <div class="wxc-icon">${currentIcon}</div>
@@ -442,7 +504,6 @@ async function loadWeather() {
       </div>
     `;
     
-    // Pronóstico de los próximos días
     const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     for(let i=0; i<4; i++) {
       const date = new Date(data.daily.time[i] + 'T12:00:00');
@@ -472,14 +533,14 @@ async function loadWeather() {
   }
 }
 
-// Iniciar service worker si existe
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 
-// Inicializar la vista
+// Iniciar ambas funciones al cargar la web
 setTime();
 loadWeather();
+loadRouteStatus();
 </script>
 </body>
 </html>
