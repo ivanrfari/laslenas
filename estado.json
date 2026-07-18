@@ -1,6 +1,6 @@
 {
   "rp222": {
-    "texto": "No se encontró información de la ruta en el último reporte oficial.",
-    "tipo": "ok"
+    "texto": "Alerta por nevadas: las medidas de prevención para residentes y viajeros en zonas cordilleranas Categorías EDUCACIÓN, CULTURA, INFANCIAS Y DGE EMETUR ENERGÍA Y AMBIENTE GOBERNACIÓN GOBIERNO, INFRAESTRUCTURA Y DESARROLLO TERRITORIAL HACIENDA Y FINANZAS IRRIGACIÓN OSEP PRODUCCIÓN PROMENDOZA SALUD Y DEPORTES SEGURIDAD Y JUSTICIA PRENSA GOBIERNO DE MENDOZA Buscar: Estado de las rutas en Mendoza Jul 18, 2026 | RUTAS Informe de rutas provinciales 18/07/26. Ruta Provincial 222 a Las Leñas: Uso obligatorio de cadenas. Ruta Provincial 89 Vallecitos: Portación de cadenas. Intransitables por nevadas: Ruta Provincial 52: Entre Villavicencio y Uspallata. Ruta Provincial 13: Entre Agua de Chilcas y el Cerro 7 Colores. Ruta Provincial 220: Entre el Arroyo Blanco y el Hotel Abandonado. Ruta Provincial 226: Entre Las Loicas y El Planchón. Atención Ciudadana Información Oficial Prensa Acceso a Webmail Políticas de privacidad Términos y condiciones de uso Seguir Seguir Seguir Seguir Av. Peltier 351, Ciudad, Mendoza, Argentina Mendoza Gobierno 2025 – 2026. Todos los derechos reservados.",
+    "tipo": "danger"
   }
 }
