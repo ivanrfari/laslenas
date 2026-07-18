@@ -1,0 +1,33 @@
+name: Actualizar Rutas Las Leñas
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Se ejecuta automáticamente en el minuto 0 de cada hora
+  workflow_dispatch: # Nos permite ejecutarlo a mano con un botón para probar
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Descargar el repositorio
+      uses: actions/checkout@v3
+
+    - name: Instalar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Instalar librerías
+      run: pip install -r requirements.txt
+
+    - name: Ejecutar el scraper
+      run: python scraper.py
+
+    - name: Guardar y subir los cambios a la web
+      run: |
+        git config --global user.name "Bot de Rutas"
+        git config --global user.email "action@github.com"
+        git add estado.json
+        git commit -m "Actualización automática del estado de rutas" || echo "No hay cambios para guardar"
+        git push
