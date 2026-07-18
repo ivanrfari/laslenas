@@ -144,7 +144,6 @@ html, body {
   box-shadow: var(--shadow);
   padding: 20px;
   border: 1px solid var(--border);
-  transition: transform 0.2s ease;
 }
 .route-main-head {
   display: flex; flex-direction: column; gap: 14px;
@@ -183,29 +182,33 @@ html, body {
 .rh-detail-box.ok     { background: linear-gradient(135deg, #e6f4ea 0%, #f3faf5 100%); color: #0d421e; border-left: 4px solid #188038; }
 .rh-detail-box .info-icon { font-size: 16px; margin-top: 2px; }
 
-/* ── WEATHER WIDGET CARD (WINDY SIN MAPA) ── */
-.windy-crop {
+/* ── NATIVE WEATHER WIDGET ── */
+.weather-native {
   background: var(--surface);
   border-radius: var(--r-inner);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  padding: 0;
-  overflow: hidden;
-  position: relative;
-  /* La altura exacta para mostrar el meteograma inferior */
-  height: 245px; 
-  /* Permite scroll horizontal en el pronóstico pero evita que se trabe la pantalla */
-  touch-action: pan-x; 
+  padding: 6px 16px;
 }
-.windy-crop iframe {
-  position: absolute;
-  /* Al pegarlo abajo y hacerlo más alto que el contenedor, el mapa queda oculto arriba */
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 500px;
-  border: none;
+.wx-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
 }
+.wx-row:last-child { border-bottom: none; }
+.wx-day { font-weight: 700; font-size: 14px; width: 60px; color: var(--text); }
+.wx-icon { font-size: 22px; width: 30px; text-align: center; }
+.wx-snow {
+  font-size: 12px; font-weight: 700; color: var(--blue);
+  flex: 1; text-align: center;
+}
+.wx-temps {
+  font-size: 15px; font-weight: 700;
+  display: flex; gap: 10px; width: 60px; justify-content: flex-end;
+}
+.wx-min { color: var(--text3); font-weight: 500; }
+.wx-max { color: var(--text); }
+.wx-loading { text-align: center; padding: 20px; font-size: 13px; color: var(--text2); }
 
 /* ── ROUTE LIST CARD (Secundarias) ── */
 .route-list {
@@ -314,7 +317,6 @@ html, body {
           <span class="chip warn" id="chip-222">⚠ Cadenas</span>
         </div>
         
-        <!-- Bloque destacado con diseño responsivo al estado visual -->
         <div class="rh-detail-box warn" id="box-222">
           <span class="info-icon">ℹ️</span>
           <span id="txt-222">Transitable con portación de cadenas obligatoria. Verificá las condiciones en tiempo real antes de salir.</span>
@@ -322,13 +324,10 @@ html, body {
       </div>
     </div>
 
-    <!-- WIDGET CLIMA (WINDY RECORTADO SIN MAPA) -->
-    <div class="slabel">Pronóstico Las Leñas (Windy)</div>
-    <div class="windy-crop">
-      <iframe src="https://embed.windy.com/embed2.html?lat=-35.145&lon=-70.080&detailLat=-35.145&detailLon=-70.080&width=100%&height=500&zoom=10&level=surface&overlay=snowAccu&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=true&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1" 
-              frameborder="0" 
-              scrolling="no">
-      </iframe>
+    <!-- WIDGET CLIMA NATIVO -->
+    <div class="slabel">Pronóstico Las Leñas</div>
+    <div class="weather-native" id="wx-container">
+      <div class="wx-loading">Cargando pronóstico...</div>
     </div>
 
     <!-- OTRAS RUTAS AFECTADAS -->
@@ -385,6 +384,7 @@ html, body {
 </div><!-- /app -->
 
 <script>
+// Función para armar la hora de actualización
 function setTime() {
   const n = new Date();
   const h = String(n.getHours()).padStart(2,'0');
@@ -393,17 +393,71 @@ function setTime() {
   document.getElementById('utime').textContent = `${h}:${m} · ${d}`;
 }
 
+// Función del botón de refresh (girar ícono)
 function refresh() {
   const ic = document.getElementById('rf-icon');
   ic.classList.add('spinning');
+  loadWeather(); // Recarga también el clima
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 750);
 }
 
+// Función nativa para cargar el clima desde Open-Meteo
+async function loadWeather() {
+  const container = document.getElementById('wx-container');
+  try {
+    // Coordenadas exactas de Las Leñas, Mendoza
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&daily=weathercode,temperature_2m_max,temperature_2m_min,snowfall_sum&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
+    const data = await res.json();
+    
+    // Diccionario de códigos meteorológicos a Emojis
+    const codes = {
+      0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️',
+      51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️',
+      71:'❄️', 73:'❄️', 75:'❄️', 77:'❄️', 80:'🌦️', 81:'🌦️', 82:'🌧️',
+      85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️'
+    };
+
+    const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    let html = '';
+    
+    for(let i=0; i<4; i++) {
+      // Forzar lectura de la fecha sin saltos de zona horaria
+      const date = new Date(data.daily.time[i] + 'T12:00:00');
+      const dayName = i === 0 ? 'Hoy' : days[date.getDay()];
+      const min = Math.round(data.daily.temperature_2m_min[i]);
+      const max = Math.round(data.daily.temperature_2m_max[i]);
+      const snowVal = data.daily.snowfall_sum[i];
+      
+      // Si hay pronóstico de nieve mayor a 0, muestra los centímetros
+      const snow = snowVal > 0 ? `🌨️ ${snowVal}cm` : '';
+      const icon = codes[data.daily.weathercode[i]] || '⛅';
+      
+      html += `
+        <div class="wx-row">
+          <div class="wx-day">${dayName}</div>
+          <div class="wx-icon">${icon}</div>
+          <div class="wx-snow">${snow}</div>
+          <div class="wx-temps">
+            <span class="wx-min">${min}°</span>
+            <span class="wx-max">${max}°</span>
+          </div>
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  } catch(e) {
+    container.innerHTML = '<div class="wx-loading">No se pudo cargar el pronóstico.</div>';
+  }
+}
+
+// Iniciar service worker si existe
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 
+// Inicializar la vista
 setTime();
+loadWeather();
 </script>
 </body>
 </html>
