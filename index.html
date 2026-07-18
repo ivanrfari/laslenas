@@ -183,6 +183,24 @@ html, body {
 .rh-detail-box.ok     { background: linear-gradient(135deg, #e6f4ea 0%, #f3faf5 100%); color: #0d421e; border-left: 4px solid #188038; }
 .rh-detail-box .info-icon { font-size: 16px; margin-top: 2px; }
 
+/* ── WEATHER WIDGET CARD ── */
+.weather-card {
+  background: var(--surface);
+  border-radius: var(--r-inner);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 12px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+.weather-card iframe {
+  width: 100%;
+  border: none;
+  min-height: 260px;
+  border-radius: 8px;
+}
+
 /* ── ROUTE LIST CARD (Secundarias) ── */
 .route-list {
   display: flex; flex-direction: column; gap: 10px;
@@ -296,6 +314,12 @@ html, body {
           <span id="txt-222">Transitable con portación de cadenas obligatoria. Verificá las condiciones en tiempo real antes de salir.</span>
         </div>
       </div>
+    </div>
+
+    <!-- WIDGET CLIMA SNOW-FORECAST -->
+    <div class="slabel">Pronóstico y Nieve</div>
+    <div class="weather-card">
+      <iframe src="https://www.snow-forecast.com/resorts/Las-Lenas/snow_report_widget" scrolling="no" frameborder="0"></iframe>
     </div>
 
     <!-- OTRAS RUTAS AFECTADAS -->
