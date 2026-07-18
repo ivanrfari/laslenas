@@ -2,48 +2,56 @@ import cloudscraper
 from bs4 import BeautifulSoup
 import json
 import requests
+import re
 
 def actualizar_rutas():
     url = 'https://prensa.mendoza.gob.ar/estado-de-las-rutas-en-mendoza-2/'
-    
-    # 1. Usamos CodeTabs para camuflar la IP de GitHub y evitar el bloqueo del gobierno
     proxy_url = f'https://api.codetabs.com/v1/proxy?quest={url}'
     
     try:
-        # Intentamos entrar por el proxy
         response = requests.get(proxy_url, timeout=15)
         html = response.text
-        
-        # Si el proxy devuelve un error o página vacía, usamos el scraper nativo como Plan B
         if "estado-de-las-rutas" not in html.lower():
             scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
             html = scraper.get(url).text
     except:
-        # Plan C si falla la conexión
         scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
         html = scraper.get(url).text
 
+    # Reemplazamos los saltos de línea HTML por texto real
+    html = re.sub(r'<br\s*/?>', '\n', html)
     soup = BeautifulSoup(html, 'html.parser')
+    
+    # Extraemos el texto separando todos los bloques con \n
+    texto_completo = soup.get_text(separator='\n', strip=True)
+    
+    # Separamos todo el documento línea por línea
+    lineas = [l.strip() for l in texto_completo.split('\n') if l.strip()]
     
     estado_rp222 = "No se encontró información de la ruta en el último reporte oficial."
     estado_tipo = "warn"
     
-    # Buscamos en TODOS los elementos (párrafos, listas, tablas, etc.)
-    for element in soup.find_all(['p', 'li', 'td', 'div', 'span']):
-        # Extraemos el texto separando los saltos de línea
-        texto = element.get_text(separator=' ', strip=True)
-        upper_texto = texto.upper()
-        
-        # Buscamos TODAS las formas en las que el gobierno suele escribir la ruta
-        nombres_ruta = ['RP 222', 'RUTA 222', 'RP222', 'R.P. 222', 'RUTA PROVINCIAL 222']
-        
-        if any(nombre in upper_texto for nombre in nombres_ruta):
-            # Nos aseguramos de que sea una oración descriptiva y no un botón suelto
-            if len(texto) > 15:
-                estado_rp222 = texto
+    nombres_ruta = ['RP 222', 'RUTA 222', 'RP222', 'R.P. 222', 'RUTA PROVINCIAL 222']
+    
+    for linea in lineas:
+        upper_linea = linea.upper()
+        if any(nombre in upper_linea for nombre in nombres_ruta):
+            if len(linea) > 15:
+                # Si el gobierno pegó muchas rutas en la misma línea, cortamos por oración (puntos)
+                if ". " in linea or "RUTA" in linea[15:].upper():
+                    oraciones = re.split(r'\.\s+', linea)
+                    for oracion in oraciones:
+                        if any(n in oracion.upper() for n in nombres_ruta):
+                            estado_rp222 = oracion.strip()
+                            # Le volvemos a poner el punto final si se lo sacó
+                            if not estado_rp222.endswith('.'):
+                                estado_rp222 += '.'
+                            break
+                else:
+                    estado_rp222 = linea
                 break
     
-    # Asignación de alertas de colores
+    # Asignación de colores y alertas automáticas
     texto_upper = estado_rp222.upper()
     if any(palabra in texto_upper for palabra in ['CORTAD', 'INTRANSITABLE', 'CERRAD']):
         estado_tipo = "danger"
@@ -59,11 +67,12 @@ def actualizar_rutas():
         }
     }
     
-    # Guardar en JSON
+    # Guardamos el archivito que luego va a leer tu página web
     with open('estado.json', 'w', encoding='utf-8') as f:
         json.dump(datos, f, ensure_ascii=False, indent=2)
         
     print("estado.json generado con éxito.")
+    print(f"Texto extraído: {estado_rp222}")
 
 if __name__ == '__main__':
     actualizar_rutas()
