@@ -328,7 +328,7 @@ html, body {
         
         <div class="rh-detail-box warn" id="box-222">
           <span class="info-icon">ℹ️</span>
-          <span id="txt-222">Sincronizando estado oficial con Vialidad...</span>
+          <span id="txt-222">Actualizando estado de rutas...</span>
         </div>
       </div>
     </div>
@@ -411,76 +411,43 @@ function refresh() {
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 750);
 }
 
-// Web Scraping MEJORADO con doble proxy de respaldo
+// Lectura local del estado de las rutas JSON generado por el script Python
 async function loadRouteStatus() {
   const chip = document.getElementById('chip-222');
   const box = document.getElementById('box-222');
   const txt = document.getElementById('txt-222');
 
   try {
-    const url = 'https://prensa.mendoza.gob.ar/estado-de-las-rutas-en-mendoza-2/';
-    let htmlText = '';
-
-    // Intento 1: API CodeTabs (suele evadir mejor a Cloudflare)
-    try {
-      const res1 = await fetch(`https://api.codetabs.com/v1/proxy?quest=${url}`);
-      if (!res1.ok) throw new Error();
-      htmlText = await res1.text();
-    } catch(e1) {
-      // Intento 2: AllOrigins en modo Raw como respaldo
-      const res2 = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
-      if (!res2.ok) throw new Error();
-      htmlText = await res2.text();
-    }
+    // Añadimos '?t=x' para asegurarnos de que el navegador no guarde en caché un archivo viejo
+    const res = await fetch('./estado.json?t=' + new Date().getTime());
+    if (!res.ok) throw new Error();
+    const data = await res.json();
     
-    // Parsear el HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlText, 'text/html');
+    txt.textContent = data.rp222.texto;
     
-    const elements = doc.querySelectorAll('p, li, div, span, strong');
-    let statusText = null;
-
-    for (const el of elements) {
-      const text = el.innerText.trim();
-      const upper = text.toUpperCase();
-      if ((upper.includes('RP 222') || upper.includes('RUTA 222') || upper.includes('RP222')) && text.length > 15) {
-        statusText = text;
-        break; 
-      }
-    }
-
-    if (statusText) {
-      txt.textContent = statusText;
-      const upperText = statusText.toUpperCase();
-      
-      if (upperText.includes('CORTAD') || upperText.includes('INTRANSITABLE') || upperText.includes('CERRAD')) {
-        chip.className = 'chip danger';
-        chip.textContent = '🚫 Cerrada';
-        box.className = 'rh-detail-box danger';
-      } else if (upperText.includes('CADENAS') || upperText.includes('PRECAUCI') || upperText.includes('HIELO')) {
-        chip.className = 'chip warn';
-        chip.textContent = '⚠ Cadenas';
-        box.className = 'rh-detail-box warn';
-      } else {
-        chip.className = 'chip ok';
-        chip.textContent = '✅ Transitable';
-        box.className = 'rh-detail-box ok';
-      }
+    if (data.rp222.tipo === 'danger') {
+      chip.className = 'chip danger';
+      chip.textContent = '🚫 Cerrada';
+      box.className = 'rh-detail-box danger';
+    } else if (data.rp222.tipo === 'warn') {
+      chip.className = 'chip warn';
+      chip.textContent = '⚠ Cadenas';
+      box.className = 'rh-detail-box warn';
     } else {
-       txt.textContent = "No se encontró el estado de la RP 222 en el último reporte. Tocá el enlace oficial para revisar manualmente.";
-       chip.className = 'chip warn';
-       chip.textContent = '⚠ Sin datos';
-       box.className = 'rh-detail-box warn';
+      chip.className = 'chip ok';
+      chip.textContent = '✅ Transitable';
+      box.className = 'rh-detail-box ok';
     }
   } catch(e) {
-    txt.textContent = "No pudimos conectar automáticamente con Vialidad por un bloqueo del servidor. Podés chequear la información en el link oficial más abajo.";
+    // Texto de respaldo si el script en Python todavía no generó el JSON
+    txt.textContent = "Verificando el estado... Asegurate de que la rutina de actualización backend esté corriendo.";
     chip.className = 'chip warn';
-    chip.textContent = '⚠ Conexión fallida';
+    chip.textContent = '⚠ Sin datos';
     box.className = 'rh-detail-box warn';
   }
 }
 
-// Función del clima
+// Función nativa para cargar el clima desde Open-Meteo
 async function loadWeather() {
   const container = document.getElementById('wx-container');
   try {
