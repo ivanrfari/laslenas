@@ -191,7 +191,6 @@ html, body {
   box-shadow: var(--shadow);
   padding: 16px;
 }
-/* Clima Actual */
 .wx-current {
   display: flex; align-items: center; justify-content: flex-start;
   padding-bottom: 14px; margin-bottom: 10px;
@@ -202,7 +201,6 @@ html, body {
 .wxc-temp { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1.1; }
 .wxc-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-top: 2px; }
 
-/* Lista de días */
 .wx-row {
   display: flex; justify-content: space-between; align-items: center;
   padding: 10px 0;
@@ -407,42 +405,47 @@ function refresh() {
   const ic = document.getElementById('rf-icon');
   ic.classList.add('spinning');
   
-  // Ejecutamos ambas actualizaciones en simultáneo
   loadWeather(); 
   loadRouteStatus();
   
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 750);
 }
 
-// NUEVA FUNCIÓN: Web Scraping del estado de la RP 222
+// Web Scraping MEJORADO con doble proxy de respaldo
 async function loadRouteStatus() {
   const chip = document.getElementById('chip-222');
   const box = document.getElementById('box-222');
   const txt = document.getElementById('txt-222');
 
   try {
-    // Usamos AllOrigins como proxy gratuito para saltar el bloqueo CORS
     const url = 'https://prensa.mendoza.gob.ar/estado-de-las-rutas-en-mendoza-2/';
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    let htmlText = '';
+
+    // Intento 1: API CodeTabs (suele evadir mejor a Cloudflare)
+    try {
+      const res1 = await fetch(`https://api.codetabs.com/v1/proxy?quest=${url}`);
+      if (!res1.ok) throw new Error();
+      htmlText = await res1.text();
+    } catch(e1) {
+      // Intento 2: AllOrigins en modo Raw como respaldo
+      const res2 = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+      if (!res2.ok) throw new Error();
+      htmlText = await res2.text();
+    }
     
-    const res = await fetch(proxyUrl);
-    const data = await res.json();
-    
-    // Convertimos el HTML recibido en un formato que podamos escanear
+    // Parsear el HTML
     const parser = new DOMParser();
-    const doc = parser.parseFromString(data.contents, 'text/html');
+    const doc = parser.parseFromString(htmlText, 'text/html');
     
-    // Escaneamos todos los textos de la página oficial
     const elements = doc.querySelectorAll('p, li, div, span, strong');
     let statusText = null;
 
-    // Buscamos específicamente información de la ruta 222
     for (const el of elements) {
       const text = el.innerText.trim();
       const upper = text.toUpperCase();
       if ((upper.includes('RP 222') || upper.includes('RUTA 222') || upper.includes('RP222')) && text.length > 15) {
         statusText = text;
-        break; // Detenemos la búsqueda al encontrar el primer acierto
+        break; 
       }
     }
 
@@ -450,7 +453,6 @@ async function loadRouteStatus() {
       txt.textContent = statusText;
       const upperText = statusText.toUpperCase();
       
-      // Lógica de colores automáticos según las palabras del reporte
       if (upperText.includes('CORTAD') || upperText.includes('INTRANSITABLE') || upperText.includes('CERRAD')) {
         chip.className = 'chip danger';
         chip.textContent = '🚫 Cerrada';
@@ -471,13 +473,14 @@ async function loadRouteStatus() {
        box.className = 'rh-detail-box warn';
     }
   } catch(e) {
-    txt.textContent = "Error al conectar con la web de Vialidad. Revisá el enlace oficial abajo.";
+    txt.textContent = "No pudimos conectar automáticamente con Vialidad por un bloqueo del servidor. Podés chequear la información en el link oficial más abajo.";
     chip.className = 'chip warn';
-    chip.textContent = '⚠ Error';
+    chip.textContent = '⚠ Conexión fallida';
+    box.className = 'rh-detail-box warn';
   }
 }
 
-// Función del clima (Mantenida igual)
+// Función del clima
 async function loadWeather() {
   const container = document.getElementById('wx-container');
   try {
@@ -537,7 +540,6 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 
-// Iniciar ambas funciones al cargar la web
 setTime();
 loadWeather();
 loadRouteStatus();
