@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f8f9fa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rutas Las Leñas">
+<link rel="manifest" href="manifest.json">
+<title>Rutas — Las Leñas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:        #f8f9fa;
+  --surface:   #ffffff;
+  --surface2:  #f1f3f4;
+  --border:    #e0e0e0;
+  --text:      #202124;
+  --text2:     #5f6368;
+  --text3:     #80868b;
+  --blue:      #1a73e8;
+  --blue-soft: #e8f0fe;
+  --green:     #188038;
+  --green-soft:#e6f4ea;
+  --yellow:    #f29900;
+  --yellow-soft:#fef7e0;
+  --red:       #d93025;
+  --red-soft:  #fce8e6;
+  --r:         12px;
+  --r-pill:    100px;
+  --safe-t:    env(safe-area-inset-top, 0px);
+  --safe-b:    env(safe-area-inset-bottom, 0px);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+  --shadow:    0 2px 6px rgba(0,0,0,.13), 0 1px 3px rgba(0,0,0,.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SHELL ── */
+.app {
+  display: flex; flex-direction: column;
+  height: 100dvh;
+  max-width: 480px; margin: 0 auto;
+}
+
+/* ── HEADER ── */
+.hdr {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: calc(var(--safe-t) + 12px) 16px 12px;
+  flex-shrink: 0;
+}
+.hdr-top {
+  display: flex; align-items: center; gap: 10px;
+}
+.hdr-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--blue-soft);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.hdr-titles h1 { font-size: 16px; font-weight: 700; color: var(--text); }
+.hdr-titles p  { font-size: 11px; color: var(--text2); margin-top: 1px; }
+.hdr-refresh {
+  margin-left: auto;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: transparent; border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--blue); font-size: 18px;
+  transition: background .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.hdr-refresh:active { background: var(--blue-soft); }
+
+/* ── STATUS BANNER ── */
+.status-banner {
+  margin-top: 10px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px;
+  border-radius: var(--r);
+  font-size: 12px; font-weight: 500;
+}
+.status-banner.warn   { background: var(--yellow-soft); color: #7a4f00; }
+.status-banner.danger { background: var(--red-soft);    color: #b3261e; }
+.status-banner.ok     { background: var(--green-soft);  color: #1e6e3a; }
+.sb-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.status-banner.warn   .sb-dot { background: var(--yellow); }
+.status-banner.danger .sb-dot { background: var(--red); }
+.status-banner.ok     .sb-dot { background: var(--green); }
+
+/* update pill */
+.upill {
+  margin-top: 8px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text3);
+}
+.upill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+
+/* ── CONTENT ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  background: var(--bg);
+  padding: 14px 14px calc(var(--safe-b) + 16px);
+}
+
+/* ── SECTION LABEL ── */
+.slabel {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text3);
+  margin: 18px 0 8px;
+}
+.slabel:first-child { margin-top: 0; }
+
+/* ── ROUTE CARD (main) ── */
+.route-main {
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.route-main-head {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.rh-top {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-bottom: 10px;
+}
+.rh-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.rh-text { flex: 1; }
+.rh-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.rh-sub  { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 11px; border-radius: var(--r-pill);
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.chip.ok     { background: var(--green-soft); color: var(--green); }
+.chip.warn   { background: var(--yellow-soft); color: #7a4f00; }
+.chip.danger { background: var(--red-soft); color: var(--red); }
+.rh-detail {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 12px;
+  background: var(--blue-soft);
+  border-radius: 8px;
+  font-size: 12px; color: #1557b0; line-height: 1.5;
+}
+
+/* ── ROUTE LIST CARD ── */
+.route-list {
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.rl-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.rl-row:last-child { border-bottom: none; }
+.rl-icon-wrap {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.rl-icon-wrap.danger { background: var(--red-soft); }
+.rl-icon-wrap.warn   { background: var(--yellow-soft); }
+.rl-icon-wrap.ok     { background: var(--green-soft); }
+.rl-info { flex: 1; }
+.rl-name   { font-size: 13px; font-weight: 700; color: var(--text); }
+.rl-detail { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* ── LINK ROW ── */
+.link-card {
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.link-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; text-decoration: none; color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .12s;
+}
+.link-row:last-child { border-bottom: none; }
+.link-row:active { background: var(--surface2); }
+.link-icon {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--blue-soft);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.link-info { flex: 1; }
+.link-label { font-size: 13px; font-weight: 500; color: var(--text); }
+.link-sub   { font-size: 11px; color: var(--text2); margin-top: 1px; }
+.link-arrow { color: var(--text3); font-size: 16px; }
+
+/* call button */
+.call-link {
+  padding: 6px 14px; border-radius: var(--r-pill);
+  background: var(--green-soft);
+  color: var(--green); font-size: 12px; font-weight: 700;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  border: none; cursor: pointer;
+}
+
+/* ── FAB (floating refresh) ── */
+.fab {
+  display: none; /* hidden — we have header button */
+}
+
+/* ── SPIN ── */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinning { animation: spin .65s linear infinite; display: inline-block; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-icon">🏔️</div>
+      <div class="hdr-titles">
+        <h1>Rutas a Las Leñas</h1>
+        <p>Mendoza · Estado en tiempo real</p>
+      </div>
+      <button class="hdr-refresh" onclick="refresh()" title="Actualizar" aria-label="Actualizar">
+        <span id="rf-icon">↻</span>
+      </button>
+    </div>
+
+    <!-- RESUMEN GLOBAL -->
+    <div class="status-banner warn" id="global-banner">
+      <div class="sb-dot"></div>
+      <span id="global-text">Acceso con restricciones — verificá antes de salir</span>
+    </div>
+
+    <div class="upill">
+      <div class="upill-dot"></div>
+      <span>Actualizado: <strong id="utime">—</strong></span>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- RP 222 PRINCIPAL -->
+    <div class="slabel">Ruta principal</div>
+    <div class="route-main">
+      <div class="route-main-head">
+        <div class="rh-top">
+          <span class="rh-icon">🛣️</span>
+          <div class="rh-text">
+            <div class="rh-name">RP 222</div>
+            <div class="rh-sub">Malargüe → Las Leñas · Km 0 al 48</div>
+          </div>
+          <span class="chip warn" id="chip-222">⚠ Cadenas</span>
+        </div>
+        <div class="rh-detail">
+          <span>ℹ️</span>
+          <span id="txt-222">Transitable con portación de cadenas obligatoria. Verificá las condiciones en tiempo real antes de salir.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTRAS RUTAS AFECTADAS -->
+    <div class="slabel">Otras rutas afectadas</div>
+    <div class="route-list">
+      <div class="rl-row">
+        <div class="rl-icon-wrap danger">🚫</div>
+        <div class="rl-info">
+          <div class="rl-name">RP 52</div>
+          <div class="rl-detail">Villavicencio – Uspallata</div>
+        </div>
+        <span class="chip danger">Cerrada</span>
+      </div>
+      <div class="rl-row">
+        <div class="rl-icon-wrap danger">🚫</div>
+        <div class="rl-info">
+          <div class="rl-name">RP 13</div>
+          <div class="rl-detail">Agua de Chilcas – Cerro 7 Colores</div>
+        </div>
+        <span class="chip danger">Cerrada</span>
+      </div>
+      <div class="rl-row">
+        <div class="rl-icon-wrap danger">🚫</div>
+        <div class="rl-info">
+          <div class="rl-name">RP 220</div>
+          <div class="rl-detail">Arroyo Blanco – Hotel Abandonado</div>
+        </div>
+        <span class="chip danger">Cerrada</span>
+      </div>
+    </div>
+
+    <!-- LINKS -->
+    <div class="slabel">Información oficial</div>
+    <div class="link-card">
+      <a class="link-row" href="https://prensa.mendoza.gob.ar/estado-de-las-rutas-en-mendoza-2/" target="_blank" rel="noopener">
+        <div class="link-icon">🏛️</div>
+        <div class="link-info">
+          <div class="link-label">Gobierno de Mendoza</div>
+          <div class="link-sub">Estado actualizado de rutas</div>
+        </div>
+        <span class="link-arrow">›</span>
+      </a>
+      <a class="link-row" href="https://www.vialidad.mendoza.gov.ar/" target="_blank" rel="noopener">
+        <div class="link-icon">🗺️</div>
+        <div class="link-info">
+          <div class="link-label">Vialidad Provincial</div>
+          <div class="link-sub">Condiciones de caminos</div>
+        </div>
+        <span class="link-arrow">›</span>
+      </a>
+    </div>
+
+    <!-- CONTACTOS -->
+    <div class="slabel">Contactos de emergencia</div>
+    <div class="link-card">
+      <div class="link-row">
+        <div class="link-icon">🚧</div>
+        <div class="link-info">
+          <div class="link-label">Vialidad Provincial</div>
+          <div class="link-sub">0800-333-8422 · gratuito</div>
+        </div>
+        <a class="call-link" href="tel:08003338422">Llamar</a>
+      </div>
+      <div class="link-row">
+        <div class="link-icon">⛷️</div>
+        <div class="link-info">
+          <div class="link-label">Las Leñas Resort</div>
+          <div class="link-sub">+54 260 447-1100</div>
+        </div>
+        <a class="call-link" href="tel:+5426044711100">Llamar</a>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<script>
+function setTime() {
+  const n = new Date();
+  const h = String(n.getHours()).padStart(2,'0');
+  const m = String(n.getMinutes()).padStart(2,'0');
+  const d = n.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'});
+  document.getElementById('utime').textContent = `${h}:${m} · ${d}`;
+}
+
+function refresh() {
+  const ic = document.getElementById('rf-icon');
+  ic.classList.add('spinning');
+  setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 750);
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+
+setTime();
+</script>
+</body>
+</html>
