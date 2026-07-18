@@ -188,27 +188,37 @@ html, body {
   border-radius: var(--r-inner);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  padding: 6px 16px;
+  padding: 16px;
 }
-.wx-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 0;
+/* Clima Actual (Nuevo) */
+.wx-current {
+  display: flex; align-items: center; justify-content: flex-start;
+  padding-bottom: 14px; margin-bottom: 10px;
   border-bottom: 1px solid var(--border);
 }
-.wx-row:last-child { border-bottom: none; }
-.wx-day { font-weight: 700; font-size: 14px; width: 60px; color: var(--text); }
-.wx-icon { font-size: 22px; width: 30px; text-align: center; }
+.wxc-icon { font-size: 34px; margin-right: 14px; }
+.wxc-info { display: flex; flex-direction: column; }
+.wxc-temp { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1.1; }
+.wxc-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-top: 2px; }
+
+/* Lista de días */
+.wx-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0;
+}
+.wx-day { font-weight: 700; font-size: 14px; width: 50px; color: var(--text); }
+.wx-icon { font-size: 20px; width: 30px; text-align: center; }
 .wx-snow {
   font-size: 12px; font-weight: 700; color: var(--blue);
   flex: 1; text-align: center;
 }
 .wx-temps {
-  font-size: 15px; font-weight: 700;
+  font-size: 14px; font-weight: 700;
   display: flex; gap: 10px; width: 60px; justify-content: flex-end;
 }
 .wx-min { color: var(--text3); font-weight: 500; }
 .wx-max { color: var(--text); }
-.wx-loading { text-align: center; padding: 20px; font-size: 13px; color: var(--text2); }
+.wx-loading { text-align: center; padding: 10px; font-size: 13px; color: var(--text2); }
 
 /* ── ROUTE LIST CARD (Secundarias) ── */
 .route-list {
@@ -405,8 +415,8 @@ function refresh() {
 async function loadWeather() {
   const container = document.getElementById('wx-container');
   try {
-    // Coordenadas exactas de Las Leñas, Mendoza
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&daily=weathercode,temperature_2m_max,temperature_2m_min,snowfall_sum&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
+    // Se agregó 'current=temperature_2m,weather_code' para el clima en tiempo real
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
     const data = await res.json();
     
     // Diccionario de códigos meteorológicos a Emojis
@@ -417,20 +427,32 @@ async function loadWeather() {
       85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️'
     };
 
-    const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    let html = '';
+    // Datos del clima actual
+    const currentTemp = Math.round(data.current.temperature_2m);
+    const currentIcon = codes[data.current.weather_code] || '⛅';
+
+    // Construcción del HTML
+    let html = `
+      <div class="wx-current">
+        <div class="wxc-icon">${currentIcon}</div>
+        <div class="wxc-info">
+          <div class="wxc-temp">${currentTemp}°C</div>
+          <div class="wxc-label">Ahora en Las Leñas</div>
+        </div>
+      </div>
+    `;
     
+    // Pronóstico de los próximos días
+    const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     for(let i=0; i<4; i++) {
-      // Forzar lectura de la fecha sin saltos de zona horaria
       const date = new Date(data.daily.time[i] + 'T12:00:00');
       const dayName = i === 0 ? 'Hoy' : days[date.getDay()];
       const min = Math.round(data.daily.temperature_2m_min[i]);
       const max = Math.round(data.daily.temperature_2m_max[i]);
       const snowVal = data.daily.snowfall_sum[i];
       
-      // Si hay pronóstico de nieve mayor a 0, muestra los centímetros
       const snow = snowVal > 0 ? `🌨️ ${snowVal}cm` : '';
-      const icon = codes[data.daily.weathercode[i]] || '⛅';
+      const icon = codes[data.daily.weather_code[i]] || '⛅';
       
       html += `
         <div class="wx-row">
@@ -446,7 +468,7 @@ async function loadWeather() {
     }
     container.innerHTML = html;
   } catch(e) {
-    container.innerHTML = '<div class="wx-loading">No se pudo cargar el pronóstico.</div>';
+    container.innerHTML = '<div class="wx-loading">No se pudo cargar el pronóstico. Verificá tu conexión.</div>';
   }
 }
 
