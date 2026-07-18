@@ -118,7 +118,7 @@ html, body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   background: var(--bg);
-  padding: 14px 14px calc(var(--safe-b) + 16px);
+  padding: 14px 14px calc(var(--safe-b) + 24px);
 }
 
 /* ── SECTION LABEL ── */
@@ -221,21 +221,6 @@ html, body {
 .link-sub   { font-size: 11px; color: var(--text2); margin-top: 1px; }
 .link-arrow { color: var(--text3); font-size: 16px; }
 
-/* call button */
-.call-link {
-  padding: 6px 14px; border-radius: var(--r-pill);
-  background: var(--green-soft);
-  color: var(--green); font-size: 12px; font-weight: 700;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-  border: none; cursor: pointer;
-}
-
-/* ── FAB (floating refresh) ── */
-.fab {
-  display: none; /* hidden — we have header button */
-}
-
 /* ── SPIN ── */
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinning { animation: spin .65s linear infinite; display: inline-block; }
@@ -332,35 +317,6 @@ html, body {
         </div>
         <span class="link-arrow">›</span>
       </a>
-      <a class="link-row" href="https://www.vialidad.mendoza.gov.ar/" target="_blank" rel="noopener">
-        <div class="link-icon">🗺️</div>
-        <div class="link-info">
-          <div class="link-label">Vialidad Provincial</div>
-          <div class="link-sub">Condiciones de caminos</div>
-        </div>
-        <span class="link-arrow">›</span>
-      </a>
-    </div>
-
-    <!-- CONTACTOS -->
-    <div class="slabel">Contactos de emergencia</div>
-    <div class="link-card">
-      <div class="link-row">
-        <div class="link-icon">🚧</div>
-        <div class="link-info">
-          <div class="link-label">Vialidad Provincial</div>
-          <div class="link-sub">0800-333-8422 · gratuito</div>
-        </div>
-        <a class="call-link" href="tel:08003338422">Llamar</a>
-      </div>
-      <div class="link-row">
-        <div class="link-icon">⛷️</div>
-        <div class="link-info">
-          <div class="link-label">Las Leñas Resort</div>
-          <div class="link-sub">+54 260 447-1100</div>
-        </div>
-        <a class="call-link" href="tel:+5426044711100">Llamar</a>
-      </div>
     </div>
 
   </div><!-- /content -->
