@@ -183,16 +183,14 @@ html, body {
 .rh-detail-box.ok     { background: linear-gradient(135deg, #e6f4ea 0%, #f3faf5 100%); color: #0d421e; border-left: 4px solid #188038; }
 .rh-detail-box .info-icon { font-size: 16px; margin-top: 2px; }
 
-/* ── WEATHER WIDGET CARD ── */
+/* ── WEATHER WIDGET CARD (SIN MAPA) ── */
 .weather-card {
   background: var(--surface);
   border-radius: var(--r-inner);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
+  padding: 16px 12px;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  padding: 0; /* Asegura que el iframe ocupe todo el espacio */
 }
 
 /* ── ROUTE LIST CARD (Secundarias) ── */
@@ -310,15 +308,13 @@ html, body {
       </div>
     </div>
 
-    <!-- WIDGET CLIMA INTERACTIVO -->
-    <div class="slabel">Pronóstico y Nieve en Las Leñas</div>
+    <!-- WIDGET CLIMA (SIN MAPA) -->
+    <div class="slabel">Pronóstico Las Leñas</div>
     <div class="weather-card">
-      <iframe src="https://embed.windy.com/embed2.html?lat=-35.145&lon=-70.080&detailLat=-35.145&detailLon=-70.080&width=100%&height=320&zoom=10&level=surface&overlay=snowAccu&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=true&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1" 
-              width="100%" 
-              height="320" 
-              frameborder="0" 
-              style="border: none; border-radius: 12px; display: block;">
-      </iframe>
+      <a class="weatherwidget-io" href="https://forecast7.com/es/n35d15n70d08/las-lenas/" data-label_1="LAS LEÑAS" data-label_2="PRONÓSTICO" data-font="Roboto" data-icons="Climacons Animated" data-theme="pure" data-textcolor="#1f2024">LAS LEÑAS PRONÓSTICO</a>
+      <script>
+      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+      </script>
     </div>
 
     <!-- OTRAS RUTAS AFECTADAS -->
