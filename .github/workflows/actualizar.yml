@@ -1,39 +1,15 @@
-name: Actualizar Estado de Rutas
-on:
-  schedule:
-    - cron: '0 * * * *' # Se ejecuta cada hora
-  workflow_dispatch:    # Permite ejecutarlo manualmente desde la pestaña Actions
-
-permissions:
-  contents: write
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout del repositorio
-      uses: actions/checkout@v3
-
-    - name: Instalar Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-
-    - name: Instalar dependencias
-      run: pip install -r requirements.txt
-
-    - name: Ejecutar scraper
-      run: python scraper.py
-
-    - name: Subir cambios al repositorio
+- name: Subir cambios al repositorio
       run: |
         git config --global user.name "Bot de Rutas"
         git config --global user.email "action@github.com"
-        # Trae los cambios remotos antes de intentar subir
+        # 1. Guardamos los cambios hechos por el scraper en un "bolsillo"
+        git stash
+        # 2. Nos actualizamos con la nube
         git pull --rebase origin main
-        # Agrega el archivo generado
+        # 3. Sacamos los cambios del "bolsillo"
+        git stash pop || echo "No había stash, continuando..."
+        # 4. Ahora sí, preparamos y subimos
         git add estado.json
-        # Verifica si hubo cambios antes de hacer commit
         if ! git diff-index --quiet HEAD; then
           git commit -m "Actualización automática del estado de rutas"
           git push origin main
