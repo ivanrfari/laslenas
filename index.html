@@ -2,322 +2,36 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
-<title>Rutas — Las Leñas</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutas Las Leñas</title>
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-
 <style>
-:root {
-  --bg:        #fdfdfd;
-  --surface:   #ffffff;
-  --surface2:  #f8f9fa;
-  --border:    #f1f3f4;
-  --text:      #1f2024;
-  --text2:     #5f6368;
-  --text3:     #9aa0a6;
-  --blue:      #1a73e8;
-  --blue-soft: #f1f7fe;
-  --green:     #137333;
-  --green-soft:#e6f4ea;
-  --yellow:    #b06000;
-  --yellow-soft:#fef7e0;
-  --red:       #c5221f;
-  --red-soft:  #fce8e6;
-  --r:         20px;
-  --r-inner:   14px;
-  --r-pill:    100px;
-  --safe-t:    env(safe-area-inset-top, 0px);
-  --safe-b:    env(safe-area-inset-bottom, 0px);
-  --shadow:    0 4px 20px rgba(0,0,0,.04), 0 2px 8px rgba(0,0,0,.02);
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html, body {
-  height: 100%; font-family: 'Google Sans', sans-serif;
-  background: var(--bg); color: var(--text); overflow: hidden;
-}
-
-.app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; background: var(--bg); }
-
-.hdr { background: var(--surface); padding: calc(var(--safe-t) + 20px) 20px 16px; flex-shrink: 0; }
-.hdr-top { display: flex; align-items: center; gap: 14px; }
-.hdr-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-.hdr-titles h1 { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
-.hdr-titles p  { font-size: 12px; color: var(--text2); margin-top: 2px; font-weight: 500; }
-.hdr-refresh { margin-left: auto; width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 20px; transition: all .2s ease; }
-.hdr-refresh:active { background: var(--border); transform: scale(0.95); }
-
-.status-banner { margin-top: 16px; display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--r-inner); font-size: 13px; font-weight: 500; }
-.status-banner.warn   { background: var(--yellow-soft); color: var(--yellow); }
-.sb-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: #f29900; animation: pulse 2s infinite; }
-@keyframes pulse { 0% { transform: scale(0.95); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.5; } }
-
-.upill { margin-top: 10px; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); padding-left: 4px; }
-.upill-dot { width: 6px; height: 6px; border-radius: 50%; background: #188038; }
-
-.content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px calc(var(--safe-b) + 30px); }
-.slabel { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text2); margin: 24px 0 12px; padding-left: 4px; }
-
-.route-main { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; border: 1px solid var(--border); }
-.route-main-head { display: flex; flex-direction: column; gap: 14px; }
-.rh-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.rh-info-group { display: flex; align-items: center; gap: 12px; }
-.rh-icon { font-size: 28px; }
-.rh-name { font-size: 20px; font-weight: 700; color: var(--text); }
-.rh-sub  { font-size: 13px; color: var(--text2); margin-top: 2px; }
-
-.chip { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: var(--r-pill); font-size: 13px; font-weight: 700; flex-shrink: 0; }
-.chip.ok     { background: var(--green-soft); color: var(--green); }
-.chip.warn   { background: var(--yellow-soft); color: var(--yellow); }
-.chip.danger { background: var(--red-soft); color: var(--red); }
-
-.rh-detail-box { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-radius: var(--r-inner); font-size: 14px; line-height: 1.5; font-weight: 500; }
-.rh-detail-box.warn   { background: linear-gradient(135deg, #fef7e0 0%, #fffbf0 100%); color: #663c00; border-left: 4px solid #f29900; }
-.rh-detail-box.danger { background: linear-gradient(135deg, #fce8e6 0%, #fff5f5 100%); color: #66120e; border-left: 4px solid #d93025; }
-.rh-detail-box.ok     { background: linear-gradient(135deg, #e6f4ea 0%, #f3faf5 100%); color: #0d421e; border-left: 4px solid #188038; }
-
-.weather-native { background: var(--surface); border-radius: var(--r-inner); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 16px; }
-.wx-current { display: flex; align-items: center; padding-bottom: 14px; margin-bottom: 10px; border-bottom: 1px solid var(--border); }
-.wxc-icon { font-size: 34px; margin-right: 14px; }
-.wxc-info { display: flex; flex-direction: column; }
-.wxc-temp { font-size: 26px; font-weight: 700; color: var(--text); }
-.wxc-label { font-size: 12px; color: var(--text2); font-weight: 500; }
-.wx-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-.wx-day { font-weight: 700; font-size: 14px; width: 50px; color: var(--text); }
-.wx-icon { font-size: 20px; width: 30px; text-align: center; }
-.wx-snow { font-size: 12px; font-weight: 700; color: var(--blue); flex: 1; text-align: center; }
-.wx-temps { font-size: 14px; font-weight: 700; display: flex; gap: 10px; width: 60px; justify-content: flex-end; }
-.wx-min { color: var(--text3); font-weight: 500; }
-.wx-max { color: var(--text); }
-
-/* ── MEDIOS DE ELEVACIÓN (NATIVO) ── */
-.lifts-list {
-  background: var(--surface); border-radius: var(--r-inner);
-  border: 1px solid var(--border); box-shadow: var(--shadow);
-  padding: 0; margin: 0; list-style: none; overflow: hidden;
-}
-.lift-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 16px; border-bottom: 1px solid var(--border);
-}
-.lift-row:last-child { border-bottom: none; }
-.lift-name { font-size: 15px; font-weight: 700; color: var(--text); }
-.lift-status { font-size: 16px; }
-.lift-empty, .lift-error {
-  font-size: 13px; color: var(--text2); text-align: center; padding: 16px; font-weight: 500;
-}
-.lift-error { color: var(--yellow); background: var(--yellow-soft); }
-
-.link-card {
-  background: var(--surface); border-radius: var(--r-inner);
-  border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden;
-}
-.link-row {
-  display: flex; align-items: center; gap: 14px; padding: 16px;
-  text-decoration: none; color: inherit;
-}
-.link-icon {
-  width: 38px; height: 38px; border-radius: 12px; background: var(--blue-soft);
-  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; color: var(--blue);
-}
-.link-info { flex: 1; }
-.link-label { font-size: 14px; font-weight: 700; color: var(--text); }
-.link-sub   { font-size: 12px; color: var(--text2); margin-top: 2px; }
-.link-arrow { color: var(--text3); font-size: 18px; font-weight: 700; }
-
-@keyframes spin { to { transform: rotate(360deg); } }
-.spinning { animation: spin .65s cubic-bezier(0.4, 0, 0.2, 1) infinite; display: inline-block; }
+:root { --bg:#fdfdfd; --surface:#ffffff; --border:#f1f3f4; --text:#1f2024; --text2:#5f6368; --shadow:0 4px 20px rgba(0,0,0,.04); }
+body { font-family: 'Google Sans', sans-serif; background: var(--bg); color: var(--text); padding: 20px; max-width: 480px; margin: 0 auto; }
+.slabel { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text2); margin: 24px 0 12px; }
+.card { background: var(--surface); border-radius: 20px; box-shadow: var(--shadow); padding: 20px; border: 1px solid var(--border); }
+.iframe-wrap { width: 100%; height: 600px; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+iframe { width: 100%; height: 100%; border: none; }
 </style>
 </head>
 <body>
 
-<div class="app">
-  <header class="hdr">
-    <div class="hdr-top">
-      <div class="hdr-icon">🏔️</div>
-      <div class="hdr-titles">
-        <h1>Rutas a Las Leñas</h1>
-        <p>Mendoza · Estado en tiempo real</p>
-      </div>
-      <button class="hdr-refresh" onclick="refresh()" title="Actualizar">
-        <span id="rf-icon">↻</span>
-      </button>
-    </div>
-    <div class="status-banner warn" id="global-banner">
-      <div class="sb-dot"></div>
-      <span id="global-text">Acceso con restricciones — verificá antes de salir</span>
-    </div>
-    <div class="upill">
-      <div class="upill-dot"></div>
-      <span>Actualizado: <strong id="utime">—</strong></span>
-    </div>
-  </header>
+<h1>Rutas Las Leñas</h1>
+<div class="slabel">Estado de Rutas</div>
+<div class="card" id="ruta-card">Cargando...</div>
 
-  <div class="content">
-    
-    <div class="slabel">Ruta principal de acceso</div>
-    <div class="route-main">
-      <div class="route-main-head">
-        <div class="rh-top">
-          <div class="rh-info-group">
-            <span class="rh-icon">🛣️</span>
-            <div>
-              <div class="rh-name">RP 222</div>
-              <div class="rh-sub">Malargüe → Las Leñas · Km 0 al 48</div>
-            </div>
-          </div>
-          <span class="chip warn" id="chip-222">...</span>
-        </div>
-        <div class="rh-detail-box warn" id="box-222">
-          <span class="info-icon">ℹ️</span>
-          <span id="txt-222">Actualizando estado de rutas...</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="slabel">Pronóstico Las Leñas</div>
-    <div class="weather-native" id="wx-container">
-      <div class="wx-loading" style="padding: 10px; text-align: center; color: var(--text2);">Cargando pronóstico...</div>
-    </div>
-
-    <!-- LISTA DE MEDIOS RECUPERADA -->
-    <div class="slabel">Medios Habilitados</div>
-    <ul class="lifts-list" id="medios-list">
-      <li class="lift-empty">Cargando estado de la montaña...</li>
-    </ul>
-
-    <div class="slabel">Información oficial</div>
-    <div class="link-card">
-      <a class="link-row" href="https://prensa.mendoza.gob.ar/estado-de-las-rutas-en-mendoza-2/" target="_blank">
-        <div class="link-icon">🏛️</div>
-        <div class="link-info">
-          <div class="link-label">Gobierno de Mendoza</div>
-          <div class="link-sub">Estado actualizado de rutas</div>
-        </div>
-        <span class="link-arrow">›</span>
-      </a>
-      <a class="link-row" href="https://laslenas.com/estado-pistas/medios/" target="_blank">
-        <div class="link-icon">⛷️</div>
-        <div class="link-info">
-          <div class="link-label">Montaña Las Leñas</div>
-          <div class="link-sub">Pistas y Medios oficiales</div>
-        </div>
-        <span class="link-arrow">›</span>
-      </a>
-    </div>
-
-  </div>
+<div class="slabel">Medios de Elevación</div>
+<div class="iframe-wrap">
+  <iframe src="https://laslenas.com/estado-pistas/medios/"></iframe>
 </div>
 
 <script>
-function setTime() {
-  const n = new Date();
-  const h = String(n.getHours()).padStart(2,'0');
-  const m = String(n.getMinutes()).padStart(2,'0');
-  const d = n.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'});
-  document.getElementById('utime').textContent = `${h}:${m} · ${d}`;
+async function loadStatus() {
+  const res = await fetch('./estado.json?t=' + new Date().getTime());
+  const data = await res.json();
+  document.getElementById('ruta-card').innerHTML = `<strong>RP 222:</strong> ${data.rp222.texto}`;
 }
-
-function refresh() {
-  const ic = document.getElementById('rf-icon');
-  ic.classList.add('spinning');
-  loadWeather(); loadRouteStatus();
-  setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 750);
-}
-
-async function loadRouteStatus() {
-  try {
-    const res = await fetch('./estado.json?t=' + new Date().getTime());
-    const data = await res.json();
-    
-    // Ruta Principal
-    const chip222 = document.getElementById('chip-222');
-    const box222 = document.getElementById('box-222');
-    document.getElementById('txt-222').textContent = data.rp222.texto;
-    
-    if (data.rp222.tipo === 'danger') {
-      chip222.className = 'chip danger'; chip222.textContent = '🚫 Cerrada';
-      box222.className = 'rh-detail-box danger';
-    } else if (data.rp222.tipo === 'warn') {
-      chip222.className = 'chip warn'; chip222.textContent = '⚠ Cadenas';
-      box222.className = 'rh-detail-box warn';
-    } else {
-      chip222.className = 'chip ok'; chip222.textContent = '✅ Transitable';
-      box222.className = 'rh-detail-box ok';
-    }
-
-    // Lista de Medios (Solo muestra los que NO están cerrados)
-    const mediosContainer = document.getElementById('medios-list');
-    mediosContainer.innerHTML = '';
-    
-    if (data.medios_error === true) {
-      mediosContainer.innerHTML = `
-        <li class="lift-error">
-          ⚠️ Sistema bloqueado temporalmente por Las Leñas.<br>Reintentando en la próxima hora.
-        </li>
-      `;
-    } else if (data.medios) {
-      let habilitadosCount = 0;
-      
-      for (const [key, val] of Object.entries(data.medios)) {
-        // Filtro: Si el tipo NO es danger (es decir, está abierto o condicional), lo dibuja
-        if (val.tipo !== 'danger') {
-          habilitadosCount++;
-          let icon = (val.tipo === 'ok') ? '✅' : '⚠️';
-          
-          mediosContainer.innerHTML += `
-            <li class="lift-row">
-              <span class="lift-name">${val.nombre}</span>
-              <span class="lift-status">${icon}</span>
-            </li>
-          `;
-        }
-      }
-      
-      // Si el contador quedó en 0, significa que todo estaba cerrado ("danger")
-      if (habilitadosCount === 0) {
-        mediosContainer.innerHTML = `
-          <li class="lift-empty">
-            Ningún medio reportado como habilitado en este momento.
-          </li>
-        `;
-      }
-    }
-  } catch(e) {
-    document.getElementById('txt-222').textContent = "Esperando actualización...";
-  }
-}
-
-async function loadWeather() {
-  const container = document.getElementById('wx-container');
-  try {
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
-    const data = await res.json();
-    const codes = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️', 71:'❄️', 73:'❄️', 75:'❄️', 77:'❄️', 80:'🌦️', 81:'🌦️', 82:'🌧️', 85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️' };
-    const currentTemp = Math.round(data.current.temperature_2m);
-    const currentIcon = codes[data.current.weather_code] || '⛅';
-    
-    let html = `<div class="wx-current"><div class="wxc-icon">${currentIcon}</div><div class="wxc-info"><div class="wxc-temp">${currentTemp}°C</div><div class="wxc-label">Ahora en Las Leñas</div></div></div>`;
-    const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    for(let i=0; i<4; i++) {
-      const date = new Date(data.daily.time[i] + 'T12:00:00');
-      const dayName = i === 0 ? 'Hoy' : days[date.getDay()];
-      const min = Math.round(data.daily.temperature_2m_min[i]);
-      const max = Math.round(data.daily.temperature_2m_max[i]);
-      const snowVal = data.daily.snowfall_sum[i];
-      const snow = snowVal > 0 ? `🌨️ ${snowVal}cm` : '';
-      const icon = codes[data.daily.weather_code[i]] || '⛅';
-      html += `<div class="wx-row"><div class="wx-day">${dayName}</div><div class="wx-icon">${icon}</div><div class="wx-snow">${snow}</div><div class="wx-temps"><span class="wx-min">${min}°</span><span class="wx-max">${max}°</span></div></div>`;
-    }
-    container.innerHTML = html;
-  } catch(e) {}
-}
-
-setTime(); loadWeather(); loadRouteStatus();
+loadStatus();
 </script>
 </body>
 </html>
