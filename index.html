@@ -219,7 +219,7 @@ html, body {
 .wx-max { color: var(--text); }
 .wx-loading { text-align: center; padding: 10px; font-size: 13px; color: var(--text2); }
 
-/* ── MEDIOS DE ELEVACIÓN HABILITADOS ── */
+/* ── MEDIOS DE ELEVACIÓN ── */
 .lifts-list {
   background: var(--surface);
   border-radius: var(--r-inner);
@@ -239,6 +239,10 @@ html, body {
 }
 .lift-row:last-child {
   border-bottom: none;
+}
+/* Si está cerrado (danger), le bajamos la opacidad para que resalte el que está abierto */
+.lift-row.danger {
+  opacity: 0.65;
 }
 .lift-name {
   font-size: 15px;
@@ -348,8 +352,8 @@ html, body {
       <div class="wx-loading">Cargando pronóstico...</div>
     </div>
 
-    <!-- MEDIOS DE ELEVACIÓN (SOLO HABILITADOS) -->
-    <div class="slabel">Medios Habilitados</div>
+    <!-- MEDIOS DE ELEVACIÓN (TODOS) -->
+    <div class="slabel">Medios de Elevación</div>
     <ul class="lifts-list" id="medios-list">
       <li class="lift-empty">Cargando estado de la montaña...</li>
     </ul>
@@ -420,28 +424,19 @@ async function loadRouteStatus() {
       box222.className = 'rh-detail-box ok';
     }
 
-    // Medios de Elevación (Filtra y muestra solo los 'ok')
+    // Medios de Elevación (Muestra todos)
     if (data.medios) {
       const mediosContainer = document.getElementById('medios-list');
       mediosContainer.innerHTML = '';
-      let habilitadosCount = 0;
       
       for (const [key, val] of Object.entries(data.medios)) {
-        if (val.tipo === 'ok') {
-          habilitadosCount++;
-          mediosContainer.innerHTML += `
-            <li class="lift-row">
-              <span class="lift-name">${val.nombre}</span>
-              <span class="lift-status">✅</span>
-            </li>
-          `;
-        }
-      }
-      
-      if (habilitadosCount === 0) {
-        mediosContainer.innerHTML = `
-          <li class="lift-empty">
-            Ningún medio reportado como habilitado en este momento.
+        // Si el estado es "ok", asigna ✅. Si es "danger", asigna ❌
+        const icon = (val.tipo === 'ok') ? '✅' : '❌';
+        
+        mediosContainer.innerHTML += `
+          <li class="lift-row ${val.tipo}">
+            <span class="lift-name">${val.nombre}</span>
+            <span class="lift-status">${icon}</span>
           </li>
         `;
       }
