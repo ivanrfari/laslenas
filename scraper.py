@@ -3,9 +3,6 @@ from bs4 import BeautifulSoup
 import json
 import requests
 import re
-import time
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 
 def actualizar_rutas():
     # ==========================================
@@ -60,8 +57,12 @@ def actualizar_rutas():
         datos["rp222"]["tipo"] = "ok"
 
     # ==========================================
-    # 2. SCRAPER CON NAVEGADOR VIRTUAL (Las Leñas)
+    # 2. SCRAPER DE MEDIOS DE ELEVACIÓN
     # ==========================================
+    # ¡URL CORREGIDA!
+    url_medios = 'https://laslenas.com/estado-pistas/medios/' 
+    proxy_medios = f'https://api.codetabs.com/v1/proxy?quest={url_medios}'
+    
     medios_dict = {
         "eros1": {"nombre": "Eros 1", "aliases": ["Eros 1", "Eros I"], "tipo": "danger"},
         "eros2": {"nombre": "Eros 2", "aliases": ["Eros 2", "Eros II"], "tipo": "danger"},
@@ -77,20 +78,14 @@ def actualizar_rutas():
     }
     
     try:
-        # Configuramos el Chrome invisible
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        
-        driver = webdriver.Chrome(options=chrome_options)
-        driver.get('https://laslenas.com/estado-de-la-montana/')
-        
-        # MAGIA: Esperamos 8 segundos a que Las Leñas dibuje las tildes con JavaScript
-        time.sleep(8) 
-        
-        html_m = driver.page_source
-        driver.quit()
+        try:
+            res_m = requests.get(proxy_medios, timeout=15)
+            html_m = res_m.text
+            if "leñas" not in html_m.lower():
+                raise Exception()
+        except:
+            scraper_m = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
+            html_m = scraper_m.get(url_medios).text
             
         soup_m = BeautifulSoup(html_m, 'html.parser')
         
@@ -104,31 +99,28 @@ def actualizar_rutas():
         
         for key, val in medios_dict.items():
             for alias in val["aliases"]:
-                # Busca exactamente la palabra del medio (ej: "Eros 1")
                 nodos_texto = soup_m.find_all(string=re.compile(rf'\b{alias}\b', re.IGNORECASE))
-                encontrado = False
                 
+                encontrado = False
                 for nodo in nodos_texto:
-                    contenedor = nodo.parent
+                    contenedor = nodo.find_parent(['tr', 'li', 'div', 'td'])
                     
-                    # Sube nivel por nivel en las "cajas" HTML aislando solo la fila de esa pista
-                    for _ in range(5):
-                        # Restricción de 1500 caracteres para asegurar que no se pase a leer la pista de abajo
-                        if contenedor and len(str(contenedor)) < 1500:
-                            html_contenedor = str(contenedor).lower()
-                            # Si encuentra alguna clave verde en esa caja aislada, lo marca ok
-                            if any(pista in html_contenedor for pista in claves_ok):
-                                val["tipo"] = "ok"
-                                encontrado = True
-                                break
-                            contenedor = contenedor.parent
-                        else:
+                    if contenedor:
+                        # Subimos un par de niveles en la estructura HTML aislando solo a esa pista
+                        for _ in range(2):
+                            if contenedor.parent and contenedor.name not in ['tr', 'li']:
+                                contenedor = contenedor.parent
+                                
+                        html_contenedor = str(contenedor).lower()
+                        
+                        # Analizamos el código de esa pista buscando si hay un ícono de abierto
+                        if any(pista in html_contenedor for pista in claves_ok):
+                            val["tipo"] = "ok"
+                            encontrado = True
                             break
                             
-                    if encontrado:
-                        break
                 if encontrado:
-                    break
+                    break 
                     
     except Exception as e:
         print(f"Error escaneando medios: {e}")
