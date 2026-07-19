@@ -14,5 +14,42 @@
   "rp220": {
     "texto": "Intransitables: RP 52 entre Villavicencio y Uspallata; RP 13 entre Agua de Chilcas y el Cerro 7 Colores; RP 220 entre el arroyo Blanco y el Hotel Abandonado, y RP 226, entre Las Loicas y El Planchón.",
     "tipo": "danger"
+  },
+  "medios": {
+    "eros": {
+      "nombre": "Eros",
+      "estado": "Sin datos",
+      "tipo": "warn"
+    },
+    "venus": {
+      "nombre": "Venus",
+      "estado": "Sin datos",
+      "tipo": "warn"
+    },
+    "neptuno": {
+      "nombre": "Neptuno",
+      "estado": "Sin datos",
+      "tipo": "warn"
+    },
+    "marte": {
+      "nombre": "Marte",
+      "estado": "Sin datos",
+      "tipo": "warn"
+    },
+    "minerva": {
+      "nombre": "Minerva",
+      "estado": "Sin datos",
+      "tipo": "warn"
+    },
+    "caris": {
+      "nombre": "Caris",
+      "estado": "Sin datos",
+      "tipo": "warn"
+    },
+    "vulcano": {
+      "nombre": "Vulcano",
+      "estado": "Sin datos",
+      "tipo": "warn"
+    }
   }
 }
