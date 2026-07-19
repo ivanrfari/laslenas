@@ -6,46 +6,83 @@
   "medios": {
     "eros1": {
       "nombre": "Eros 1",
+      "aliases": [
+        "Eros 1",
+        "Eros I"
+      ],
       "tipo": "danger"
     },
     "eros2": {
       "nombre": "Eros 2",
+      "aliases": [
+        "Eros 2",
+        "Eros II"
+      ],
       "tipo": "danger"
     },
     "venus1": {
       "nombre": "Venus 1",
+      "aliases": [
+        "Venus 1",
+        "Venus I"
+      ],
       "tipo": "danger"
     },
     "venus2": {
       "nombre": "Venus 2",
+      "aliases": [
+        "Venus 2",
+        "Venus II"
+      ],
       "tipo": "danger"
     },
     "neptuno": {
       "nombre": "Neptuno",
+      "aliases": [
+        "Neptuno"
+      ],
       "tipo": "danger"
     },
     "marte": {
       "nombre": "Marte",
+      "aliases": [
+        "Marte"
+      ],
       "tipo": "danger"
     },
     "minerva": {
       "nombre": "Minerva",
+      "aliases": [
+        "Minerva"
+      ],
       "tipo": "danger"
     },
     "caris": {
       "nombre": "Caris",
+      "aliases": [
+        "Caris"
+      ],
       "tipo": "danger"
     },
     "vulcano": {
       "nombre": "Vulcano",
+      "aliases": [
+        "Vulcano"
+      ],
       "tipo": "danger"
     },
     "urano": {
       "nombre": "Urano",
+      "aliases": [
+        "Urano"
+      ],
       "tipo": "danger"
     },
     "vesta": {
       "nombre": "Vesta",
+      "aliases": [
+        "Vesta"
+      ],
       "tipo": "danger"
     }
   }
