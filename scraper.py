@@ -57,82 +57,79 @@ def actualizar_rutas():
         datos["rp222"]["tipo"] = "ok"
 
     # ==========================================
-    # 2. SCRAPER ANTI-BLOQUEOS (Medios Las Leñas)
+    # 2. SCRAPER DE MEDIOS (Con detector de romanos)
     # ==========================================
     url_medios = 'https://laslenas.com/estado-pistas/medios/' 
     
-    # Lista de proxies (puentes) para saltar a Cloudflare
     proxies = [
         f'https://api.allorigins.win/raw?url={url_medios}',
         f'https://api.codetabs.com/v1/proxy?quest={url_medios}'
     ]
     
     html_m = ""
-    # Intentamos primero con los puentes
     for proxy in proxies:
         try:
             res = requests.get(proxy, timeout=15)
-            # Solo consideramos que funcionó si la página nombra al medio "Eros"
-            if "eros" in res.text.lower():
+            if "neptuno" in res.text.lower():
                 html_m = res.text
                 break
         except:
             continue
             
-    # Si los puentes fallan, intentamos directo con Cloudscraper
     if not html_m:
         try:
             scraper_m = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
             res_m = scraper_m.get(url_medios)
-            if "eros" in res_m.text.lower():
+            if "neptuno" in res_m.text.lower():
                 html_m = res_m.text
         except:
             pass
 
+    # Incluimos los números romanos en los "aliases" para que no se le escape ninguno
     medios_dict = {
-        "eros1": {"nombre": "Eros 1", "aliases": ["Eros 1", "Eros I"], "tipo": "danger"},
-        "eros2": {"nombre": "Eros 2", "aliases": ["Eros 2", "Eros II"], "tipo": "danger"},
-        "venus1": {"nombre": "Venus 1", "aliases": ["Venus 1", "Venus I"], "tipo": "danger"},
-        "venus2": {"nombre": "Venus 2", "aliases": ["Venus 2", "Venus II"], "tipo": "danger"},
-        "neptuno": {"nombre": "Neptuno", "aliases": ["Neptuno"], "tipo": "danger"},
-        "marte": {"nombre": "Marte", "aliases": ["Marte"], "tipo": "danger"},
-        "minerva": {"nombre": "Minerva", "aliases": ["Minerva"], "tipo": "danger"},
-        "caris": {"nombre": "Caris", "aliases": ["Caris"], "tipo": "danger"},
-        "vulcano": {"nombre": "Vulcano", "aliases": ["Vulcano"], "tipo": "danger"},
-        "urano": {"nombre": "Urano", "aliases": ["Urano"], "tipo": "danger"},
-        "vesta": {"nombre": "Vesta", "aliases": ["Vesta"], "tipo": "danger"}
+        "eros1": {"nombre": "Eros 1", "aliases": ["eros 1", "eros i"], "tipo": "danger"},
+        "eros2": {"nombre": "Eros 2", "aliases": ["eros 2", "eros ii"], "tipo": "danger"},
+        "venus1": {"nombre": "Venus 1", "aliases": ["venus 1", "venus i"], "tipo": "danger"},
+        "venus2": {"nombre": "Venus 2", "aliases": ["venus 2", "venus ii"], "tipo": "danger"},
+        "neptuno": {"nombre": "Neptuno", "aliases": ["neptuno"], "tipo": "danger"},
+        "marte": {"nombre": "Marte", "aliases": ["marte"], "tipo": "danger"},
+        "minerva": {"nombre": "Minerva", "aliases": ["minerva"], "tipo": "danger"},
+        "caris": {"nombre": "Caris", "aliases": ["caris"], "tipo": "danger"},
+        "vulcano": {"nombre": "Vulcano", "aliases": ["vulcano"], "tipo": "danger"},
+        "urano": {"nombre": "Urano", "aliases": ["urano"], "tipo": "danger"},
+        "vesta": {"nombre": "Vesta", "aliases": ["vesta"], "tipo": "danger"}
     }
 
     if not html_m:
-        # EL ROBOT FUE BLOQUEADO. No inventamos datos.
         datos["medios_error"] = True
     else:
-        # TENEMOS LA PÁGINA. Leemos los datos.
         datos["medios_error"] = False
         soup_m = BeautifulSoup(html_m, 'html.parser')
         
-        claves_ok = ['abierto', 'habilitado', 'open', 'status-open', 'bg-green', 'text-green', 'check', 'fa-check', '✅', '✔', 'abierto.png', 'verde', 'dot-green']
+        cajas_nombres = soup_m.find_all('div', class_=re.compile(r'medio__row--medio'))
         
-        for key, val in medios_dict.items():
-            for alias in val["aliases"]:
-                nodos_texto = soup_m.find_all(string=re.compile(rf'\b{alias}\b', re.IGNORECASE))
-                encontrado = False
-                
-                for nodo in nodos_texto:
-                    contenedor = nodo.find_parent(['tr', 'li', 'div', 'td'])
-                    if contenedor:
-                        # Revisamos la caja HTML y sus contenedores cercanos
-                        html_contenedor = str(contenedor).lower()
-                        if contenedor.parent:
-                            html_contenedor += str(contenedor.parent).lower()
-                            
-                        if any(pista in html_contenedor for pista in claves_ok):
-                            val["tipo"] = "ok"
-                            encontrado = True
-                            break
-                if encontrado:
-                    break 
+        for caja in cajas_nombres:
+            texto_pista = caja.get_text(strip=True).lower()
+            
+            for key, val in medios_dict.items():
+                # Revisa si la caja contiene el nombre normal o el romano
+                if any(alias in texto_pista or alias.replace(" ", "") in texto_pista for alias in val["aliases"]):
                     
+                    caja_estado = caja.find_next_sibling('div', class_=re.compile(r'medio__row--estado'))
+                    
+                    if caja_estado:
+                        imagen = caja_estado.find('img')
+                        if imagen and 'src' in imagen.attrs:
+                            link_imagen = imagen['src'].lower()
+                            
+                            if 'cerrada' in link_imagen:
+                                val["tipo"] = "danger"
+                            elif 'condicional' in link_imagen:
+                                val["tipo"] = "warn"
+                            else:
+                                val["tipo"] = "ok"
+                    break
+
     datos["medios"] = medios_dict
 
     # ==========================================
