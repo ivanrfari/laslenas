@@ -24,10 +24,11 @@ jobs:
     - name: Ejecutar el scraper
       run: python scraper.py
 
-    - name: Guardar y subir los cambios a la web
+- name: Guardar y subir los cambios a la web
       run: |
         git config --global user.name "Bot de Rutas"
         git config --global user.email "action@github.com"
+        git pull --rebase origin main
         git add estado.json
         git commit -m "Actualización automática del estado de rutas" || echo "No hay cambios para guardar"
-        git push
+        git push origin main
