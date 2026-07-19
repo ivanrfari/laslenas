@@ -3,53 +3,50 @@
     "texto": "RP222 a Las Leñas: Transitable, portación y uso obligatorio de cadenas en tramos con hielo.",
     "tipo": "warn"
   },
-  "rp52": {
-    "texto": "Intransitables: RP 52 entre Villavicencio y Uspallata; RP 13 entre Agua de Chilcas y el Cerro 7 Colores; RP 220 entre el arroyo Blanco y el Hotel Abandonado, y RP 226, entre Las Loicas y El Planchón.",
-    "tipo": "danger"
-  },
-  "rp13": {
-    "texto": "Intransitables: RP 52 entre Villavicencio y Uspallata; RP 13 entre Agua de Chilcas y el Cerro 7 Colores; RP 220 entre el arroyo Blanco y el Hotel Abandonado, y RP 226, entre Las Loicas y El Planchón.",
-    "tipo": "danger"
-  },
-  "rp220": {
-    "texto": "Intransitables: RP 52 entre Villavicencio y Uspallata; RP 13 entre Agua de Chilcas y el Cerro 7 Colores; RP 220 entre el arroyo Blanco y el Hotel Abandonado, y RP 226, entre Las Loicas y El Planchón.",
-    "tipo": "danger"
-  },
   "medios": {
-    "eros": {
-      "nombre": "Eros",
-      "estado": "Sin datos",
-      "tipo": "warn"
+    "eros1": {
+      "nombre": "Eros 1",
+      "tipo": "danger"
     },
-    "venus": {
-      "nombre": "Venus",
-      "estado": "Sin datos",
-      "tipo": "warn"
+    "eros2": {
+      "nombre": "Eros 2",
+      "tipo": "danger"
+    },
+    "venus1": {
+      "nombre": "Venus 1",
+      "tipo": "danger"
+    },
+    "venus2": {
+      "nombre": "Venus 2",
+      "tipo": "danger"
     },
     "neptuno": {
       "nombre": "Neptuno",
-      "estado": "Sin datos",
-      "tipo": "warn"
+      "tipo": "danger"
     },
     "marte": {
       "nombre": "Marte",
-      "estado": "Sin datos",
-      "tipo": "warn"
+      "tipo": "danger"
     },
     "minerva": {
       "nombre": "Minerva",
-      "estado": "Sin datos",
-      "tipo": "warn"
+      "tipo": "danger"
     },
     "caris": {
       "nombre": "Caris",
-      "estado": "Sin datos",
-      "tipo": "warn"
+      "tipo": "danger"
     },
     "vulcano": {
       "nombre": "Vulcano",
-      "estado": "Sin datos",
-      "tipo": "warn"
+      "tipo": "danger"
+    },
+    "urano": {
+      "nombre": "Urano",
+      "tipo": "danger"
+    },
+    "vesta": {
+      "nombre": "Vesta",
+      "tipo": "danger"
     }
   }
 }
