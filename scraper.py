@@ -63,19 +63,19 @@ def actualizar_rutas():
     url_medios = 'https://laslenas.com/estado-de-la-montana/' 
     proxy_medios = f'https://api.codetabs.com/v1/proxy?quest={url_medios}'
     
-    # Lista completa de medios. Por defecto asume cerrado (cruz) si no encuentra confirmación.
+    # Agregamos "aliases" por si escriben los nombres con números romanos
     medios_dict = {
-        "eros1": {"nombre": "Eros 1", "tipo": "danger"},
-        "eros2": {"nombre": "Eros 2", "tipo": "danger"},
-        "venus1": {"nombre": "Venus 1", "tipo": "danger"},
-        "venus2": {"nombre": "Venus 2", "tipo": "danger"},
-        "neptuno": {"nombre": "Neptuno", "tipo": "danger"},
-        "marte": {"nombre": "Marte", "tipo": "danger"},
-        "minerva": {"nombre": "Minerva", "tipo": "danger"},
-        "caris": {"nombre": "Caris", "tipo": "danger"},
-        "vulcano": {"nombre": "Vulcano", "tipo": "danger"},
-        "urano": {"nombre": "Urano", "tipo": "danger"},
-        "vesta": {"nombre": "Vesta", "tipo": "danger"}
+        "eros1": {"nombre": "Eros 1", "aliases": ["Eros 1", "Eros I"], "tipo": "danger"},
+        "eros2": {"nombre": "Eros 2", "aliases": ["Eros 2", "Eros II"], "tipo": "danger"},
+        "venus1": {"nombre": "Venus 1", "aliases": ["Venus 1", "Venus I"], "tipo": "danger"},
+        "venus2": {"nombre": "Venus 2", "aliases": ["Venus 2", "Venus II"], "tipo": "danger"},
+        "neptuno": {"nombre": "Neptuno", "aliases": ["Neptuno"], "tipo": "danger"},
+        "marte": {"nombre": "Marte", "aliases": ["Marte"], "tipo": "danger"},
+        "minerva": {"nombre": "Minerva", "aliases": ["Minerva"], "tipo": "danger"},
+        "caris": {"nombre": "Caris", "aliases": ["Caris"], "tipo": "danger"},
+        "vulcano": {"nombre": "Vulcano", "aliases": ["Vulcano"], "tipo": "danger"},
+        "urano": {"nombre": "Urano", "aliases": ["Urano"], "tipo": "danger"},
+        "vesta": {"nombre": "Vesta", "aliases": ["Vesta"], "tipo": "danger"}
     }
     
     try:
@@ -91,21 +91,23 @@ def actualizar_rutas():
         soup_m = BeautifulSoup(html_m, 'html.parser')
         
         for key, val in medios_dict.items():
-            # Buscamos el nombre del medio en el HTML
-            nombre_buscar = val["nombre"]
-            elemento = soup_m.find(string=re.compile(rf'\b{nombre_buscar}\b', re.IGNORECASE))
-            
-            if elemento:
-                # Buscamos en todo el bloque que lo envuelve (<tr>, <li>, <div>)
-                padre = elemento.find_parent(['tr', 'li', 'div', 'ul'])
-                if padre:
-                    html_padre = str(padre).lower()
-                    # Pistas en el código de que está habilitado (tilde, check, abierto, verde)
-                    if any(pista in html_padre for pista in ['abierto', 'habilitado', 'check', 'tilde', 'green', 'verde', 'ok', 'yes', 'status-open', 'icon-check']):
-                        val["tipo"] = "ok"
-                    # Pistas en el código de que está deshabilitado
-                    elif any(pista in html_padre for pista in ['cerrado', 'deshabilitado', 'cruz', 'cross', 'red', 'rojo', 'no', 'status-closed', 'icon-close']):
-                        val["tipo"] = "danger"
+            encontrado = False
+            for alias in val["aliases"]:
+                if encontrado:
+                    break
+                
+                # Buscamos el nombre ignorando mayúsculas y minúsculas
+                elemento = soup_m.find(string=re.compile(alias, re.IGNORECASE))
+                
+                if elemento:
+                    # Buscamos todo el bloque de la tabla o lista
+                    padre = elemento.find_parent(['tr', 'li', 'div', 'ul', 'tbody'])
+                    if padre:
+                        html_padre = str(padre).lower()
+                        # Detectamos palabras o clases de íconos que indiquen que está abierto
+                        if any(pista in html_padre for pista in ['abierto', 'habilitado', 'check', 'verde', 'green', 'open', 'status-open']):
+                            val["tipo"] = "ok"
+                    encontrado = True
     except Exception as e:
         print(f"Error escaneando medios: {e}")
         
