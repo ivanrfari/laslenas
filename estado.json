@@ -8,83 +8,83 @@
     "eros1": {
       "nombre": "Eros 1",
       "aliases": [
-        "Eros 1",
-        "Eros I"
+        "eros 1",
+        "eros i"
       ],
-      "tipo": "danger"
+      "tipo": "ok"
     },
     "eros2": {
       "nombre": "Eros 2",
       "aliases": [
-        "Eros 2",
-        "Eros II"
+        "eros 2",
+        "eros ii"
       ],
       "tipo": "danger"
     },
     "venus1": {
       "nombre": "Venus 1",
       "aliases": [
-        "Venus 1",
-        "Venus I"
+        "venus 1",
+        "venus i"
       ],
       "tipo": "danger"
     },
     "venus2": {
       "nombre": "Venus 2",
       "aliases": [
-        "Venus 2",
-        "Venus II"
+        "venus 2",
+        "venus ii"
       ],
       "tipo": "danger"
     },
     "neptuno": {
       "nombre": "Neptuno",
       "aliases": [
-        "Neptuno"
+        "neptuno"
       ],
       "tipo": "danger"
     },
     "marte": {
       "nombre": "Marte",
       "aliases": [
-        "Marte"
+        "marte"
       ],
       "tipo": "danger"
     },
     "minerva": {
       "nombre": "Minerva",
       "aliases": [
-        "Minerva"
+        "minerva"
       ],
       "tipo": "danger"
     },
     "caris": {
       "nombre": "Caris",
       "aliases": [
-        "Caris"
+        "caris"
       ],
       "tipo": "danger"
     },
     "vulcano": {
       "nombre": "Vulcano",
       "aliases": [
-        "Vulcano"
+        "vulcano"
       ],
       "tipo": "danger"
     },
     "urano": {
       "nombre": "Urano",
       "aliases": [
-        "Urano"
+        "urano"
       ],
       "tipo": "danger"
     },
     "vesta": {
       "nombre": "Vesta",
       "aliases": [
-        "Vesta"
+        "vesta"
       ],
-      "tipo": "danger"
+      "tipo": "ok"
     }
   }
 }
