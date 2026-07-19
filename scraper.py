@@ -1,4 +1,5 @@
 import cloudscraper
+from bs4 import BeautifulSoup
 import json
 import requests
 import re
@@ -19,10 +20,10 @@ def actualizar_rutas():
         scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
         html_r = scraper.get(url_rutas).text
 
-    # Limpiamos el HTML para leer el texto
     html_r = re.sub(r'<br\s*/?>', '\n', html_r)
-    texto_completo = re.sub(r'<[^>]+>', '\n', html_r) # Quita todas las etiquetas ocultas
+    soup_r = BeautifulSoup(html_r, 'html.parser')
     
+    texto_completo = soup_r.get_text(separator='\n', strip=True)
     lineas = [l.strip() for l in texto_completo.split('\n') if l.strip()]
     
     datos = {
@@ -56,7 +57,7 @@ def actualizar_rutas():
         datos["rp222"]["tipo"] = "ok"
 
     # ==========================================
-    # 2. SCRAPER INTELIGENTE DE MEDIOS
+    # 2. SCRAPER DE CONTENEDOR (Medios Las Leñas)
     # ==========================================
     url_medios = 'https://laslenas.com/estado-de-la-montana/' 
     proxy_medios = f'https://api.codetabs.com/v1/proxy?quest={url_medios}'
@@ -85,43 +86,42 @@ def actualizar_rutas():
             scraper_m = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
             html_m = scraper_m.get(url_medios).text
             
-        html_lower = html_m.lower()
+        soup_m = BeautifulSoup(html_m, 'html.parser')
         
-        # Diccionario con todas las formas posibles de "Abierto" y "Cerrado" en el código
-        keywords_ok = ['abierto', 'habilitado', 'check', 'verde', 'green', 'open', 'status-open', '✔', '✅', 'dot-green']
-        keywords_danger = ['cerrado', 'deshabilitado', 'cruz', 'rojo', 'red', 'closed', 'status-closed', 'fa-times', '❌', 'dot-red']
-
+        # Diccionario extremo de palabras, clases e imágenes que significan "Habilitado"
+        claves_ok = [
+            'abierto', 'habilitado', 'open', 'status-open', 'bg-green', 
+            'text-green', 'check', 'fa-check', '✅', '✔', 'abierto.png', 
+            'open.png', 'verde', 'dot-green', 'status_1', 'estado-abierto',
+            'icon-check', 'habilitada'
+        ]
+        
         for key, val in medios_dict.items():
             for alias in val["aliases"]:
-                idx = html_lower.find(alias.lower())
+                # Buscamos nodos de texto que contengan el nombre de la pista
+                nodos_texto = soup_m.find_all(string=re.compile(rf'\b{alias}\b', re.IGNORECASE))
                 
-                if idx != -1:
-                    # Si encuentra la telesilla, recorta un bloque del código a su alrededor
-                    start = max(0, idx - 250)
-                    end = min(len(html_lower), idx + 400)
-                    window = html_lower[start:end]
+                encontrado = False
+                for nodo in nodos_texto:
+                    # Encontramos la fila de tabla <tr> o lista <li> que envuelve a la pista
+                    contenedor = nodo.find_parent(['tr', 'li', 'div'])
                     
-                    # Calcula el punto exacto donde está el nombre
-                    center = idx - start
-                    
-                    # Mide qué tan cerca está una palabra de habilitado
-                    dist_ok = 9999
-                    for k in keywords_ok:
-                        for match in re.finditer(re.escape(k), window):
-                            d = abs(match.start() - center)
-                            if d < dist_ok: dist_ok = d
+                    if contenedor:
+                        # Subimos hasta 2 niveles más arriba por si está muy anidado en el HTML
+                        for _ in range(2):
+                            if contenedor.parent and contenedor.name not in ['tr', 'li']:
+                                contenedor = contenedor.parent
                                 
-                    # Mide qué tan cerca está una palabra de cerrado
-                    dist_danger = 9999
-                    for k in keywords_danger:
-                        for match in re.finditer(re.escape(k), window):
-                            d = abs(match.start() - center)
-                            if d < dist_danger: dist_danger = d
-                                
-                    # Compara distancias: la que esté más pegada al nombre de la pista, es el estado real.
-                    if dist_ok < dist_danger:
-                        val["tipo"] = "ok"
-                    break
+                        html_contenedor = str(contenedor).lower()
+                        
+                        # Analizamos TODO el código de ESA única fila buscando indicadores de apertura
+                        if any(pista in html_contenedor for pista in claves_ok):
+                            val["tipo"] = "ok"
+                            encontrado = True
+                            break # Rompe el loop del nodo
+                            
+                if encontrado:
+                    break # Rompe el loop de los aliases y pasa al siguiente medio
                     
     except Exception as e:
         print(f"Error escaneando medios: {e}")
