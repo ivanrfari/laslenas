@@ -6,7 +6,7 @@ import re
 
 def actualizar_rutas():
     # ==========================================
-    # 1. SCRAPER DE RUTAS (Vialidad)
+    # 1. SCRAPER DE LA RP 222 (Vialidad)
     # ==========================================
     url_rutas = 'https://prensa.mendoza.gob.ar/estado-de-las-rutas-en-mendoza-2/'
     proxy_rutas = f'https://api.codetabs.com/v1/proxy?quest={url_rutas}'
@@ -28,65 +28,54 @@ def actualizar_rutas():
     lineas = [l.strip() for l in texto_completo.split('\n') if l.strip()]
     
     datos = {
-        "rp222": {"texto": "Sin datos actualizados", "tipo": "warn"},
-        "rp52": {"texto": "Villavicencio – Uspallata", "tipo": "warn"},
-        "rp13": {"texto": "Agua de Chilcas – Cerro 7 Colores", "tipo": "warn"},
-        "rp220": {"texto": "Arroyo Blanco – Hotel Abandonado", "tipo": "warn"}
+        "rp222": {"texto": "Sin datos actualizados", "tipo": "warn"}
     }
 
-    rutas_buscar = {
-        "rp222": ['RP 222', 'RUTA 222', 'RP222', 'R.P. 222', 'RUTA PROVINCIAL 222'],
-        "rp52": ['RP 52', 'RUTA 52', 'RP52', 'R.P. 52', 'RUTA PROVINCIAL 52'],
-        "rp13": ['RP 13', 'RUTA 13', 'RP13', 'R.P. 13', 'RUTA PROVINCIAL 13'],
-        "rp220": ['RP 220', 'RUTA 220', 'RP220', 'R.P. 220', 'RUTA PROVINCIAL 220']
-    }
+    nombres_ruta = ['RP 222', 'RUTA 222', 'RP222', 'R.P. 222', 'RUTA PROVINCIAL 222']
     
     for linea in lineas:
         upper_linea = linea.upper()
-        
-        tipo_linea = "warn"
-        if any(p in upper_linea for p in ['CORTAD', 'INTRANSITABLE', 'CERRAD']):
-            tipo_linea = "danger"
-        elif any(p in upper_linea for p in ['CADENAS', 'PRECAUCI', 'HIELO']):
-            tipo_linea = "warn"
-        elif "TRANSITABLE" in upper_linea:
-            tipo_linea = "ok"
-
-        oraciones = re.split(r'\.\s+', linea)
-        
-        for key, aliases in rutas_buscar.items():
-            for oracion in oraciones:
-                upper_oracion = oracion.upper()
-                if any(alias in upper_oracion for alias in aliases):
-                    texto_final = oracion.strip()
-                    if not texto_final.endswith('.'): texto_final += '.'
-                    
-                    tipo_oracion = tipo_linea
-                    if any(p in upper_oracion for p in ['CORTAD', 'INTRANSITABLE', 'CERRAD']):
-                        tipo_oracion = "danger"
-                    elif any(p in upper_oracion for p in ['CADENAS', 'PRECAUCI', 'HIELO']):
-                        tipo_oracion = "warn"
-                    elif "TRANSITABLE" in upper_oracion:
-                        tipo_oracion = "ok"
-                        
-                    datos[key] = {"texto": texto_final, "tipo": tipo_oracion}
-                    break 
+        if any(nombre in upper_linea for nombre in nombres_ruta):
+            if len(linea) > 15:
+                if ". " in linea or "RUTA" in linea[15:].upper():
+                    oraciones = re.split(r'\.\s+', linea)
+                    for oracion in oraciones:
+                        if any(n in oracion.upper() for n in nombres_ruta):
+                            texto_final = oracion.strip()
+                            if not texto_final.endswith('.'): texto_final += '.'
+                            datos["rp222"]["texto"] = texto_final
+                            break
+                else:
+                    datos["rp222"]["texto"] = linea
+                break
+    
+    texto_upper = datos["rp222"]["texto"].upper()
+    if any(palabra in texto_upper for palabra in ['CORTAD', 'INTRANSITABLE', 'CERRAD']):
+        datos["rp222"]["tipo"] = "danger"
+    elif any(palabra in texto_upper for palabra in ['CADENAS', 'PRECAUCI', 'HIELO']):
+        datos["rp222"]["tipo"] = "warn"
+    elif "TRANSITABLE" in texto_upper:
+        datos["rp222"]["tipo"] = "ok"
 
     # ==========================================
     # 2. SCRAPER DE MEDIOS DE ELEVACIÓN
     # ==========================================
-    # URL oficial de estado de montaña de Las Leñas
     url_medios = 'https://laslenas.com/estado-de-la-montana/' 
     proxy_medios = f'https://api.codetabs.com/v1/proxy?quest={url_medios}'
     
+    # Lista completa de medios. Por defecto asume cerrado (cruz) si no encuentra confirmación.
     medios_dict = {
-        "eros": {"nombre": "Eros", "estado": "Sin datos", "tipo": "warn"},
-        "venus": {"nombre": "Venus", "estado": "Sin datos", "tipo": "warn"},
-        "neptuno": {"nombre": "Neptuno", "estado": "Sin datos", "tipo": "warn"},
-        "marte": {"nombre": "Marte", "estado": "Sin datos", "tipo": "warn"},
-        "minerva": {"nombre": "Minerva", "estado": "Sin datos", "tipo": "warn"},
-        "caris": {"nombre": "Caris", "estado": "Sin datos", "tipo": "warn"},
-        "vulcano": {"nombre": "Vulcano", "estado": "Sin datos", "tipo": "warn"}
+        "eros1": {"nombre": "Eros 1", "tipo": "danger"},
+        "eros2": {"nombre": "Eros 2", "tipo": "danger"},
+        "venus1": {"nombre": "Venus 1", "tipo": "danger"},
+        "venus2": {"nombre": "Venus 2", "tipo": "danger"},
+        "neptuno": {"nombre": "Neptuno", "tipo": "danger"},
+        "marte": {"nombre": "Marte", "tipo": "danger"},
+        "minerva": {"nombre": "Minerva", "tipo": "danger"},
+        "caris": {"nombre": "Caris", "tipo": "danger"},
+        "vulcano": {"nombre": "Vulcano", "tipo": "danger"},
+        "urano": {"nombre": "Urano", "tipo": "danger"},
+        "vesta": {"nombre": "Vesta", "tipo": "danger"}
     }
     
     try:
@@ -101,33 +90,24 @@ def actualizar_rutas():
             
         soup_m = BeautifulSoup(html_m, 'html.parser')
         
-        # Buscar cada medio en el HTML
         for key, val in medios_dict.items():
-            nombre_buscar = val["nombre"].upper()
+            # Buscamos el nombre del medio en el HTML
+            nombre_buscar = val["nombre"]
+            elemento = soup_m.find(string=re.compile(rf'\b{nombre_buscar}\b', re.IGNORECASE))
             
-            # Buscar el texto del medio
-            elemento = soup_m.find(string=re.compile(nombre_buscar, re.IGNORECASE))
             if elemento:
-                # Subimos un par de etiquetas en el HTML para leer si dice Abierto o Cerrado cerca del nombre
-                padre = elemento.parent
-                for _ in range(4): 
-                    if padre:
-                        texto_padre = padre.get_text(separator=' ', strip=True).upper()
-                        if "ABIERTO" in texto_padre or "HABILITADO" in texto_padre:
-                            val["estado"] = "Abierto"
-                            val["tipo"] = "ok"
-                            break
-                        elif "CONDICIONAL" in texto_padre or "PREPARACI" in texto_padre:
-                            val["estado"] = "Condicional"
-                            val["tipo"] = "warn"
-                            break
-                        elif "CERRADO" in texto_padre:
-                            val["estado"] = "Cerrado"
-                            val["tipo"] = "danger"
-                            break
-                        padre = padre.parent
+                # Buscamos en todo el bloque que lo envuelve (<tr>, <li>, <div>)
+                padre = elemento.find_parent(['tr', 'li', 'div', 'ul'])
+                if padre:
+                    html_padre = str(padre).lower()
+                    # Pistas en el código de que está habilitado (tilde, check, abierto, verde)
+                    if any(pista in html_padre for pista in ['abierto', 'habilitado', 'check', 'tilde', 'green', 'verde', 'ok', 'yes', 'status-open', 'icon-check']):
+                        val["tipo"] = "ok"
+                    # Pistas en el código de que está deshabilitado
+                    elif any(pista in html_padre for pista in ['cerrado', 'deshabilitado', 'cruz', 'cross', 'red', 'rojo', 'no', 'status-closed', 'icon-close']):
+                        val["tipo"] = "danger"
     except Exception as e:
-        print(f"No se pudieron actualizar los medios: {e}")
+        print(f"Error escaneando medios: {e}")
         
     datos["medios"] = medios_dict
 
@@ -137,7 +117,7 @@ def actualizar_rutas():
     with open('estado.json', 'w', encoding='utf-8') as f:
         json.dump(datos, f, ensure_ascii=False, indent=2)
         
-    print("estado.json generado con éxito para rutas y medios.")
+    print("estado.json generado con éxito.")
 
 if __name__ == '__main__':
     actualizar_rutas()
