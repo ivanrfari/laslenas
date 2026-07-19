@@ -57,12 +57,38 @@ def actualizar_rutas():
         datos["rp222"]["tipo"] = "ok"
 
     # ==========================================
-    # 2. SCRAPER DE MEDIOS DE ELEVACIÓN
+    # 2. SCRAPER ANTI-BLOQUEOS (Medios Las Leñas)
     # ==========================================
-    # ¡URL CORREGIDA!
     url_medios = 'https://laslenas.com/estado-pistas/medios/' 
-    proxy_medios = f'https://api.codetabs.com/v1/proxy?quest={url_medios}'
     
+    # Lista de proxies (puentes) para saltar a Cloudflare
+    proxies = [
+        f'https://api.allorigins.win/raw?url={url_medios}',
+        f'https://api.codetabs.com/v1/proxy?quest={url_medios}'
+    ]
+    
+    html_m = ""
+    # Intentamos primero con los puentes
+    for proxy in proxies:
+        try:
+            res = requests.get(proxy, timeout=15)
+            # Solo consideramos que funcionó si la página nombra al medio "Eros"
+            if "eros" in res.text.lower():
+                html_m = res.text
+                break
+        except:
+            continue
+            
+    # Si los puentes fallan, intentamos directo con Cloudscraper
+    if not html_m:
+        try:
+            scraper_m = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
+            res_m = scraper_m.get(url_medios)
+            if "eros" in res_m.text.lower():
+                html_m = res_m.text
+        except:
+            pass
+
     medios_dict = {
         "eros1": {"nombre": "Eros 1", "aliases": ["Eros 1", "Eros I"], "tipo": "danger"},
         "eros2": {"nombre": "Eros 2", "aliases": ["Eros 2", "Eros II"], "tipo": "danger"},
@@ -76,55 +102,37 @@ def actualizar_rutas():
         "urano": {"nombre": "Urano", "aliases": ["Urano"], "tipo": "danger"},
         "vesta": {"nombre": "Vesta", "aliases": ["Vesta"], "tipo": "danger"}
     }
-    
-    try:
-        try:
-            res_m = requests.get(proxy_medios, timeout=15)
-            html_m = res_m.text
-            if "leñas" not in html_m.lower():
-                raise Exception()
-        except:
-            scraper_m = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
-            html_m = scraper_m.get(url_medios).text
-            
+
+    if not html_m:
+        # EL ROBOT FUE BLOQUEADO. No inventamos datos.
+        datos["medios_error"] = True
+    else:
+        # TENEMOS LA PÁGINA. Leemos los datos.
+        datos["medios_error"] = False
         soup_m = BeautifulSoup(html_m, 'html.parser')
         
-        # Diccionario extremo de palabras, clases e imágenes que significan "Habilitado"
-        claves_ok = [
-            'abierto', 'habilitado', 'open', 'status-open', 'bg-green', 
-            'text-green', 'check', 'fa-check', '✅', '✔', 'abierto.png', 
-            'open.png', 'verde', 'dot-green', 'status_1', 'estado-abierto',
-            'icon-check', 'habilitada'
-        ]
+        claves_ok = ['abierto', 'habilitado', 'open', 'status-open', 'bg-green', 'text-green', 'check', 'fa-check', '✅', '✔', 'abierto.png', 'verde', 'dot-green']
         
         for key, val in medios_dict.items():
             for alias in val["aliases"]:
                 nodos_texto = soup_m.find_all(string=re.compile(rf'\b{alias}\b', re.IGNORECASE))
-                
                 encontrado = False
+                
                 for nodo in nodos_texto:
                     contenedor = nodo.find_parent(['tr', 'li', 'div', 'td'])
-                    
                     if contenedor:
-                        # Subimos un par de niveles en la estructura HTML aislando solo a esa pista
-                        for _ in range(2):
-                            if contenedor.parent and contenedor.name not in ['tr', 'li']:
-                                contenedor = contenedor.parent
-                                
+                        # Revisamos la caja HTML y sus contenedores cercanos
                         html_contenedor = str(contenedor).lower()
-                        
-                        # Analizamos el código de esa pista buscando si hay un ícono de abierto
+                        if contenedor.parent:
+                            html_contenedor += str(contenedor.parent).lower()
+                            
                         if any(pista in html_contenedor for pista in claves_ok):
                             val["tipo"] = "ok"
                             encontrado = True
                             break
-                            
                 if encontrado:
                     break 
                     
-    except Exception as e:
-        print(f"Error escaneando medios: {e}")
-        
     datos["medios"] = medios_dict
 
     # ==========================================
