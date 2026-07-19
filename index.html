@@ -219,103 +219,40 @@ html, body {
 .wx-max { color: var(--text); }
 .wx-loading { text-align: center; padding: 10px; font-size: 13px; color: var(--text2); }
 
-/* ── MEDIOS DE ELEVACIÓN GRID ── */
-.lifts-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-.lift-card {
+/* ── MEDIOS DE ELEVACIÓN (NUEVA LISTA) ── */
+.lifts-list {
   background: var(--surface);
   border-radius: var(--r-inner);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  overflow: hidden;
 }
-.lift-top {
+.lift-row {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
 }
-.lift-icon {
-  font-size: 16px;
+.lift-row:last-child {
+  border-bottom: none;
 }
 .lift-name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-.lift-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 6px;
-  width: fit-content;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.lift-status {
+  font-size: 18px;
 }
-.lift-badge.ok { background: var(--green-soft); color: var(--green); }
-.lift-badge.warn { background: var(--yellow-soft); color: var(--yellow); }
-.lift-badge.danger { background: var(--red-soft); color: var(--red); }
-.l-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;}
-.lift-badge.ok .l-dot { background: var(--green); }
-.lift-badge.warn .l-dot { background: var(--yellow); }
-.lift-badge.danger .l-dot { background: var(--red); }
-.lift-empty { font-size: 13px; color: var(--text2); text-align: center; grid-column: 1 / -1; padding: 10px; }
-
-/* ── OTRAS RUTAS (BLOQUE UNIFICADO) ── */
-.other-routes-card {
-  background: var(--surface);
-  border-radius: var(--r-inner);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.or-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.or-status {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 4px 8px;
-  border-radius: 6px;
-  flex-shrink: 0;
-  width: 78px;
-  text-align: center;
-  letter-spacing: 0.3px;
-}
-.or-status.danger { background: var(--red-soft); color: var(--red); }
-.or-status.warn   { background: var(--yellow-soft); color: var(--yellow); }
-.or-status.ok     { background: var(--green-soft); color: var(--green); }
-
-.or-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-  flex-shrink: 0;
-}
-.or-text {
+.lift-empty {
   font-size: 13px;
   color: var(--text2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
+  text-align: center;
+  padding: 16px;
 }
 
 /* ── LINK CARD ── */
@@ -411,31 +348,11 @@ html, body {
       <div class="wx-loading">Cargando pronóstico...</div>
     </div>
 
-    <!-- MEDIOS DE ELEVACIÓN -->
-    <div class="slabel">Estado de Medios de Elevación</div>
-    <div class="lifts-container" id="medios-grid">
-      <div class="lift-empty">Cargando estado de la montaña...</div>
-    </div>
-
-    <!-- OTRAS RUTAS AFECTADAS -->
-    <div class="slabel">Otras rutas afectadas</div>
-    <div class="other-routes-card">
-      <div class="or-row">
-        <div class="or-status warn" id="status-52">...</div>
-        <div class="or-name">RP 52</div>
-        <div class="or-text" id="txt-52">Cargando datos...</div>
-      </div>
-      <div class="or-row">
-        <div class="or-status warn" id="status-13">...</div>
-        <div class="or-name">RP 13</div>
-        <div class="or-text" id="txt-13">Cargando datos...</div>
-      </div>
-      <div class="or-row">
-        <div class="or-status warn" id="status-220">...</div>
-        <div class="or-name">RP 220</div>
-        <div class="or-text" id="txt-220">Cargando datos...</div>
-      </div>
-    </div>
+    <!-- MEDIOS DE ELEVACIÓN (NUEVA LISTA) -->
+    <div class="slabel">Medios de Elevación</div>
+    <ul class="lifts-list" id="medios-list">
+      <li class="lift-empty">Cargando estado de la montaña...</li>
+    </ul>
 
     <!-- LINKS -->
     <div class="slabel">Información oficial</div>
@@ -452,7 +369,7 @@ html, body {
         <div class="link-icon">⛷️</div>
         <div class="link-info">
           <div class="link-label">Montaña Las Leñas</div>
-          <div class="link-sub">Pistas y Medios</div>
+          <div class="link-sub">Pistas y Medios oficiales</div>
         </div>
         <span class="link-arrow">›</span>
       </a>
@@ -480,22 +397,6 @@ function refresh() {
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 750);
 }
 
-function updateSecondaryRoute(id, data) {
-  if(!data) return;
-  const status = document.getElementById('status-' + id);
-  const txt = document.getElementById('txt-' + id);
-  
-  txt.textContent = data.texto;
-  
-  if (data.tipo === 'danger') {
-    status.className = 'or-status danger'; status.textContent = 'CERRADA';
-  } else if (data.tipo === 'warn') {
-    status.className = 'or-status warn'; status.textContent = 'PRECAUCIÓN';
-  } else {
-    status.className = 'or-status ok'; status.textContent = 'ABIERTA';
-  }
-}
-
 // Carga principal desde estado.json
 async function loadRouteStatus() {
   try {
@@ -503,7 +404,7 @@ async function loadRouteStatus() {
     if (!res.ok) throw new Error();
     const data = await res.json();
     
-    // Rutas Principales
+    // Ruta Principal
     const chip222 = document.getElementById('chip-222');
     const box222 = document.getElementById('box-222');
     document.getElementById('txt-222').textContent = data.rp222.texto;
@@ -519,27 +420,18 @@ async function loadRouteStatus() {
       box222.className = 'rh-detail-box ok';
     }
 
-    // Rutas Secundarias en la nueva caja unificada
-    updateSecondaryRoute('52', data.rp52);
-    updateSecondaryRoute('13', data.rp13);
-    updateSecondaryRoute('220', data.rp220);
-
-    // Medios de Elevación
+    // Medios de Elevación (Lista ✅ / ❌)
     if (data.medios) {
-      const mediosContainer = document.getElementById('medios-grid');
+      const mediosContainer = document.getElementById('medios-list');
       mediosContainer.innerHTML = '';
       for (const [key, val] of Object.entries(data.medios)) {
+        // Si el estado es "ok" (verde/abierto), le asignamos la tilde, si no, la cruz.
+        const icon = (val.tipo === 'ok') ? '✅' : '❌';
         mediosContainer.innerHTML += `
-          <div class="lift-card">
-            <div class="lift-top">
-              <span class="lift-icon">🚠</span>
-              <span class="lift-name">${val.nombre}</span>
-            </div>
-            <div class="lift-badge ${val.tipo}">
-              <div class="l-dot"></div>
-              ${val.estado}
-            </div>
-          </div>
+          <li class="lift-row">
+            <span class="lift-name">${val.nombre}</span>
+            <span class="lift-status">${icon}</span>
+          </li>
         `;
       }
     }
