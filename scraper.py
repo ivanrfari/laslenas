@@ -63,7 +63,7 @@ def actualizar_rutas():
     url_medios = 'https://laslenas.com/estado-de-la-montana/' 
     proxy_medios = f'https://api.codetabs.com/v1/proxy?quest={url_medios}'
     
-    # Agregamos "aliases" por si escriben los nombres con números romanos
+    # Lista de medios asumiendo cerrado ("danger") por defecto
     medios_dict = {
         "eros1": {"nombre": "Eros 1", "aliases": ["Eros 1", "Eros I"], "tipo": "danger"},
         "eros2": {"nombre": "Eros 2", "aliases": ["Eros 2", "Eros II"], "tipo": "danger"},
@@ -88,26 +88,21 @@ def actualizar_rutas():
             scraper_m = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
             html_m = scraper_m.get(url_medios).text
             
-        soup_m = BeautifulSoup(html_m, 'html.parser')
+        # Pasamos todo el HTML a minúsculas para escanearlo en bruto
+        html_lower = html_m.lower()
         
         for key, val in medios_dict.items():
-            encontrado = False
             for alias in val["aliases"]:
-                if encontrado:
-                    break
-                
-                # Buscamos el nombre ignorando mayúsculas y minúsculas
-                elemento = soup_m.find(string=re.compile(alias, re.IGNORECASE))
-                
-                if elemento:
-                    # Buscamos todo el bloque de la tabla o lista
-                    padre = elemento.find_parent(['tr', 'li', 'div', 'ul', 'tbody'])
-                    if padre:
-                        html_padre = str(padre).lower()
-                        # Detectamos palabras o clases de íconos que indiquen que está abierto
-                        if any(pista in html_padre for pista in ['abierto', 'habilitado', 'check', 'verde', 'green', 'open', 'status-open']):
-                            val["tipo"] = "ok"
-                    encontrado = True
+                alias_lower = alias.lower()
+                idx = html_lower.find(alias_lower)
+                if idx != -1:
+                    # Si encuentra el nombre, agarra un bloque de 250 caracteres antes y después del nombre
+                    window = html_lower[max(0, idx - 250) : min(len(html_lower), idx + 250)]
+                    
+                    # Busca cualquier indicador de que está abierto en ese bloque cercano
+                    if any(pista in window for pista in ['abierto', 'habilitado', 'check', 'verde', 'green', 'open', 'status-open', 'icon-check']):
+                        val["tipo"] = "ok"
+                    break # Si ya lo encontró, deja de buscar los otros aliases
     except Exception as e:
         print(f"Error escaneando medios: {e}")
         
