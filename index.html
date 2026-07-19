@@ -244,7 +244,7 @@ html, body {
 .rl-icon-wrap.ok     { background: var(--green-soft); }
 .rl-info { flex: 1; }
 .rl-name   { font-size: 15px; font-weight: 700; color: var(--text); }
-.rl-detail { font-size: 12px; color: var(--text2); margin-top: 2px; font-weight: 500; }
+.rl-detail { font-size: 12px; color: var(--text2); margin-top: 2px; font-weight: 500; line-height: 1.3; }
 
 /* ── LINK CARD ── */
 .link-card {
@@ -342,37 +342,40 @@ html, body {
     <!-- OTRAS RUTAS AFECTADAS -->
     <div class="slabel">Otras rutas afectadas</div>
     <div class="route-list">
+      <!-- RP 52 -->
       <div class="rl-row">
         <div class="rl-left">
-          <div class="rl-icon-wrap danger">🚫</div>
+          <div class="rl-icon-wrap warn" id="icon-52">...</div>
           <div class="rl-info">
             <div class="rl-name">RP 52</div>
-            <div class="rl-detail">Villavicencio – Uspallata</div>
+            <div class="rl-detail" id="txt-52">Cargando datos...</div>
           </div>
         </div>
-        <span class="chip danger">Cerrada</span>
+        <span class="chip warn" id="chip-52">...</span>
       </div>
       
+      <!-- RP 13 -->
       <div class="rl-row">
         <div class="rl-left">
-          <div class="rl-icon-wrap danger">🚫</div>
+          <div class="rl-icon-wrap warn" id="icon-13">...</div>
           <div class="rl-info">
             <div class="rl-name">RP 13</div>
-            <div class="rl-detail">Agua de Chilcas – Cerro 7 Colores</div>
+            <div class="rl-detail" id="txt-13">Cargando datos...</div>
           </div>
         </div>
-        <span class="chip danger">Cerrada</span>
+        <span class="chip warn" id="chip-13">...</span>
       </div>
       
+      <!-- RP 220 -->
       <div class="rl-row">
         <div class="rl-left">
-          <div class="rl-icon-wrap danger">🚫</div>
+          <div class="rl-icon-wrap warn" id="icon-220">...</div>
           <div class="rl-info">
             <div class="rl-name">RP 220</div>
-            <div class="rl-detail">Arroyo Blanco – Hotel Abandonado</div>
+            <div class="rl-detail" id="txt-220">Cargando datos...</div>
           </div>
         </div>
-        <span class="chip danger">Cerrada</span>
+        <span class="chip warn" id="chip-220">...</span>
       </div>
     </div>
 
@@ -411,43 +414,62 @@ function refresh() {
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 750);
 }
 
-// Lectura local del estado de las rutas JSON generado por el script Python
-async function loadRouteStatus() {
-  const chip = document.getElementById('chip-222');
-  const box = document.getElementById('box-222');
-  const txt = document.getElementById('txt-222');
+// Función auxiliar para actualizar las tarjetas de las rutas secundarias
+function updateSecondaryRoute(id, data) {
+  if(!data) return;
+  const chip = document.getElementById('chip-' + id);
+  const icon = document.getElementById('icon-' + id);
+  const txt = document.getElementById('txt-' + id);
+  
+  txt.textContent = data.texto;
+  
+  if (data.tipo === 'danger') {
+    chip.className = 'chip danger'; chip.textContent = '🚫 Cerrada';
+    icon.className = 'rl-icon-wrap danger'; icon.textContent = '🚫';
+  } else if (data.tipo === 'warn') {
+    chip.className = 'chip warn'; chip.textContent = '⚠ Precaución';
+    icon.className = 'rl-icon-wrap warn'; icon.textContent = '⚠';
+  } else {
+    chip.className = 'chip ok'; chip.textContent = '✅ Abierta';
+    icon.className = 'rl-icon-wrap ok'; icon.textContent = '✅';
+  }
+}
 
+async function loadRouteStatus() {
   try {
-    // Añadimos '?t=x' para asegurarnos de que el navegador no guarde en caché un archivo viejo
     const res = await fetch('./estado.json?t=' + new Date().getTime());
     if (!res.ok) throw new Error();
     const data = await res.json();
     
-    txt.textContent = data.rp222.texto;
+    // Actualizar RP 222 (Principal)
+    const chip222 = document.getElementById('chip-222');
+    const box222 = document.getElementById('box-222');
+    document.getElementById('txt-222').textContent = data.rp222.texto;
     
     if (data.rp222.tipo === 'danger') {
-      chip.className = 'chip danger';
-      chip.textContent = '🚫 Cerrada';
-      box.className = 'rh-detail-box danger';
+      chip222.className = 'chip danger'; chip222.textContent = '🚫 Cerrada';
+      box222.className = 'rh-detail-box danger';
     } else if (data.rp222.tipo === 'warn') {
-      chip.className = 'chip warn';
-      chip.textContent = '⚠ Cadenas';
-      box.className = 'rh-detail-box warn';
+      chip222.className = 'chip warn'; chip222.textContent = '⚠ Cadenas';
+      box222.className = 'rh-detail-box warn';
     } else {
-      chip.className = 'chip ok';
-      chip.textContent = '✅ Transitable';
-      box.className = 'rh-detail-box ok';
+      chip222.className = 'chip ok'; chip222.textContent = '✅ Transitable';
+      box222.className = 'rh-detail-box ok';
     }
+
+    // Actualizar Rutas Secundarias
+    updateSecondaryRoute('52', data.rp52);
+    updateSecondaryRoute('13', data.rp13);
+    updateSecondaryRoute('220', data.rp220);
+
   } catch(e) {
-    // Texto de respaldo si el script en Python todavía no generó el JSON
-    txt.textContent = "Verificando el estado... Asegurate de que la rutina de actualización backend esté corriendo.";
-    chip.className = 'chip warn';
-    chip.textContent = '⚠ Sin datos';
-    box.className = 'rh-detail-box warn';
+    document.getElementById('txt-222').textContent = "Verificando el estado... Asegurate de que la rutina de actualización backend esté corriendo.";
+    document.getElementById('chip-222').className = 'chip warn';
+    document.getElementById('chip-222').textContent = '⚠ Sin datos';
+    document.getElementById('box-222').className = 'rh-detail-box warn';
   }
 }
 
-// Función nativa para cargar el clima desde Open-Meteo
 async function loadWeather() {
   const container = document.getElementById('wx-container');
   try {
