@@ -3,6 +3,7 @@
     "texto": "RP222 a Las Leñas: Transitable, portación y uso obligatorio de cadenas en tramos con hielo.",
     "tipo": "warn"
   },
+  "medios_error": false,
   "medios": {
     "eros1": {
       "nombre": "Eros 1",
