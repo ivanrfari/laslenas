@@ -57,7 +57,7 @@ def actualizar_rutas():
         datos["rp222"]["tipo"] = "ok"
 
     # ==========================================
-    # 2. SCRAPER DE MEDIOS (Con detector de romanos)
+    # 2. SCRAPER DE MEDIOS (A PRUEBA DE FALLOS)
     # ==========================================
     url_medios = 'https://laslenas.com/estado-pistas/medios/' 
     
@@ -70,7 +70,8 @@ def actualizar_rutas():
     for proxy in proxies:
         try:
             res = requests.get(proxy, timeout=15)
-            if "neptuno" in res.text.lower():
+            # Solo consideramos éxito si trae la clase CSS exacta que me pasaste
+            if "medios__row" in res.text:
                 html_m = res.text
                 break
         except:
@@ -80,12 +81,11 @@ def actualizar_rutas():
         try:
             scraper_m = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
             res_m = scraper_m.get(url_medios)
-            if "neptuno" in res_m.text.lower():
+            if "medios__row" in res_m.text:
                 html_m = res_m.text
         except:
             pass
 
-    # Incluimos los números romanos en los "aliases" para que no se le escape ninguno
     medios_dict = {
         "eros1": {"nombre": "Eros 1", "aliases": ["eros 1", "eros i"], "tipo": "danger"},
         "eros2": {"nombre": "Eros 2", "aliases": ["eros 2", "eros ii"], "tipo": "danger"},
@@ -106,29 +106,33 @@ def actualizar_rutas():
         datos["medios_error"] = False
         soup_m = BeautifulSoup(html_m, 'html.parser')
         
-        cajas_nombres = soup_m.find_all('div', class_=re.compile(r'medio__row--medio'))
+        # ACA ESTÁ LA SOLUCIÓN: Agrupamos todo por la fila maestra
+        filas = soup_m.find_all('div', class_=re.compile(r'medios__row'))
         
-        for caja in cajas_nombres:
-            texto_pista = caja.get_text(strip=True).lower()
-            
-            for key, val in medios_dict.items():
-                # Revisa si la caja contiene el nombre normal o el romano
-                if any(alias in texto_pista or alias.replace(" ", "") in texto_pista for alias in val["aliases"]):
+        if len(filas) == 0:
+            datos["medios_error"] = True # Por si Las Leñas cambia la web de nuevo
+        else:
+            for fila in filas:
+                medio_div = fila.find('div', class_=re.compile(r'medio__row--medio'))
+                estado_div = fila.find('div', class_=re.compile(r'medio__row--estado'))
+                
+                if medio_div and estado_div:
+                    # Le quitamos ABSOLUTAMENTE TODOS los espacios al nombre (Queda: "tkerosii")
+                    texto_pista = medio_div.get_text(strip=True).lower().replace(" ", "")
                     
-                    caja_estado = caja.find_next_sibling('div', class_=re.compile(r'medio__row--estado'))
-                    
-                    if caja_estado:
-                        imagen = caja_estado.find('img')
-                        if imagen and 'src' in imagen.attrs:
-                            link_imagen = imagen['src'].lower()
-                            
-                            if 'cerrada' in link_imagen:
-                                val["tipo"] = "danger"
-                            elif 'condicional' in link_imagen:
-                                val["tipo"] = "warn"
-                            else:
-                                val["tipo"] = "ok"
-                    break
+                    for key, val in medios_dict.items():
+                        # Si encuentra el alias sin espacios en el texto sin espacios
+                        if any(alias.replace(" ", "") in texto_pista for alias in val["aliases"]):
+                            img = estado_div.find('img')
+                            if img and 'src' in img.attrs:
+                                src = img['src'].lower()
+                                if 'abierta' in src or 'abierto' in src:
+                                    val["tipo"] = "ok"
+                                elif 'condicional' in src:
+                                    val["tipo"] = "warn"
+                                else:
+                                    val["tipo"] = "danger"
+                            break
 
     datos["medios"] = medios_dict
 
