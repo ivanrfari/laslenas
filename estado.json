@@ -2,5 +2,17 @@
   "rp222": {
     "texto": "RP222 a Las Leñas: Transitable, portación y uso obligatorio de cadenas en tramos con hielo.",
     "tipo": "warn"
+  },
+  "rp52": {
+    "texto": "Intransitables: RP 52 entre Villavicencio y Uspallata; RP 13 entre Agua de Chilcas y el Cerro 7 Colores; RP 220 entre el arroyo Blanco y el Hotel Abandonado, y RP 226, entre Las Loicas y El Planchón.",
+    "tipo": "danger"
+  },
+  "rp13": {
+    "texto": "Intransitables: RP 52 entre Villavicencio y Uspallata; RP 13 entre Agua de Chilcas y el Cerro 7 Colores; RP 220 entre el arroyo Blanco y el Hotel Abandonado, y RP 226, entre Las Loicas y El Planchón.",
+    "tipo": "danger"
+  },
+  "rp220": {
+    "texto": "Intransitables: RP 52 entre Villavicencio y Uspallata; RP 13 entre Agua de Chilcas y el Cerro 7 Colores; RP 220 entre el arroyo Blanco y el Hotel Abandonado, y RP 226, entre Las Loicas y El Planchón.",
+    "tipo": "danger"
   }
 }
