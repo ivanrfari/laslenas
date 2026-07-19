@@ -2,36 +2,85 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rutas Las Leñas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Rutas — Las Leñas</title>
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
 <style>
-:root { --bg:#fdfdfd; --surface:#ffffff; --border:#f1f3f4; --text:#1f2024; --text2:#5f6368; --shadow:0 4px 20px rgba(0,0,0,.04); }
-body { font-family: 'Google Sans', sans-serif; background: var(--bg); color: var(--text); padding: 20px; max-width: 480px; margin: 0 auto; }
-.slabel { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text2); margin: 24px 0 12px; }
-.card { background: var(--surface); border-radius: 20px; box-shadow: var(--shadow); padding: 20px; border: 1px solid var(--border); }
-.iframe-wrap { width: 100%; height: 600px; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+:root { --bg:#fdfdfd; --surface:#ffffff; --surface2:#f8f9fa; --border:#f1f3f4; --text:#1f2024; --text2:#5f6368; --text3:#9aa0a6; --blue:#1a73e8; --blue-soft:#f1f7fe; --green:#137333; --green-soft:#e6f4ea; --yellow:#b06000; --yellow-soft:#fef7e0; --red:#c5221f; --red-soft:#fce8e6; --r:20px; --r-inner:14px; --shadow:0 4px 20px rgba(0,0,0,.04); }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Google Sans', sans-serif; background: var(--bg); color: var(--text); }
+.app { max-width: 480px; margin: 0 auto; padding: 20px; }
+.hdr { padding-bottom: 20px; }
+.slabel { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text2); margin: 24px 0 12px; }
+
+/* Tarjetas */
+.card { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; border: 1px solid var(--border); }
+.chip { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 100px; font-size: 13px; font-weight: 700; }
+.chip.warn { background: var(--yellow-soft); color: var(--yellow); }
+.chip.ok { background: var(--green-soft); color: var(--green); }
+
+/* Clima */
+.weather-native { background: var(--surface); border-radius: var(--r); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 16px; }
+.wx-current { display: flex; align-items: center; padding-bottom: 14px; margin-bottom: 10px; border-bottom: 1px solid var(--border); }
+.wx-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+
+/* Iframe Integrado */
+.iframe-container { width: 100%; height: 500px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); background: white; }
 iframe { width: 100%; height: 100%; border: none; }
 </style>
 </head>
 <body>
 
-<h1>Rutas Las Leñas</h1>
-<div class="slabel">Estado de Rutas</div>
-<div class="card" id="ruta-card">Cargando...</div>
+<div class="app">
+  <header class="hdr">
+    <h1>Rutas a Las Leñas</h1>
+    <p style="color:var(--text2); font-size:14px;">Estado en tiempo real</p>
+  </header>
 
-<div class="slabel">Medios de Elevación</div>
-<div class="iframe-wrap">
-  <iframe src="https://laslenas.com/estado-pistas/medios/"></iframe>
+  <div class="slabel">Ruta principal</div>
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong>RP 222</strong>
+        <span class="chip warn" id="chip-222">Actualizando...</span>
+    </div>
+    <p id="txt-222" style="margin-top:10px; font-size:14px;">Consultando estado...</p>
+  </div>
+
+  <div class="slabel">Pronóstico</div>
+  <div class="weather-native" id="wx-container">Cargando...</div>
+
+  <div class="slabel">Medios de Elevación</div>
+  <div class="iframe-container">
+    <iframe src="https://laslenas.com/estado-pistas/medios/"></iframe>
+  </div>
 </div>
 
 <script>
-async function loadStatus() {
-  const res = await fetch('./estado.json?t=' + new Date().getTime());
-  const data = await res.json();
-  document.getElementById('ruta-card').innerHTML = `<strong>RP 222:</strong> ${data.rp222.texto}`;
+async function loadData() {
+  // Carga Rutas
+  try {
+    const res = await fetch('./estado.json?t=' + new Date().getTime());
+    const data = await res.json();
+    document.getElementById('txt-222').textContent = data.rp222.texto;
+    const chip = document.getElementById('chip-222');
+    chip.textContent = data.rp222.tipo === 'ok' ? '✅ Transitable' : '⚠ Cadenas/Corte';
+    chip.className = data.rp222.tipo === 'ok' ? 'chip ok' : 'chip warn';
+  } catch(e) {}
+
+  // Carga Clima
+  try {
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=America%2FArgentina%2FMendoza&forecast_days=3');
+    const data = await res.json();
+    const codes = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 71:'❄️', 73:'❄️', 75:'❄️' };
+    let html = `<div class="wx-current"><div style="font-size:30px; margin-right:15px;">${codes[data.current.weather_code] || '⛅'}</div><div><strong>${Math.round(data.current.temperature_2m)}°C</strong><br><small>Ahora</small></div></div>`;
+    for(let i=0; i<3; i++) {
+      html += `<div class="wx-row"><span>${i===0?'Hoy':i===1?'Mañana':'Pasado'}</span><span>${codes[data.daily.weather_code[i]]}</span><span>${Math.round(data.daily.temperature_2m_min[i])}°/${Math.round(data.daily.temperature_2m_max[i])}°</span></div>`;
+    }
+    document.getElementById('wx-container').innerHTML = html;
+  } catch(e) {}
 }
-loadStatus();
+loadData();
 </script>
 </body>
 </html>
