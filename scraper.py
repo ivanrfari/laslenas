@@ -1,5 +1,4 @@
 import cloudscraper
-from bs4 import BeautifulSoup
 import json
 import requests
 import re
@@ -15,16 +14,15 @@ def actualizar_rutas():
         response = requests.get(proxy_rutas, timeout=15)
         html_r = response.text
         if "estado-de-las-rutas" not in html_r.lower():
-            scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
-            html_r = scraper.get(url_rutas).text
+            raise Exception()
     except:
         scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
         html_r = scraper.get(url_rutas).text
 
+    # Limpiamos el HTML para leer el texto
     html_r = re.sub(r'<br\s*/?>', '\n', html_r)
-    soup_r = BeautifulSoup(html_r, 'html.parser')
+    texto_completo = re.sub(r'<[^>]+>', '\n', html_r) # Quita todas las etiquetas ocultas
     
-    texto_completo = soup_r.get_text(separator='\n', strip=True)
     lineas = [l.strip() for l in texto_completo.split('\n') if l.strip()]
     
     datos = {
@@ -58,12 +56,11 @@ def actualizar_rutas():
         datos["rp222"]["tipo"] = "ok"
 
     # ==========================================
-    # 2. SCRAPER DE MEDIOS DE ELEVACIÓN
+    # 2. SCRAPER INTELIGENTE DE MEDIOS
     # ==========================================
     url_medios = 'https://laslenas.com/estado-de-la-montana/' 
     proxy_medios = f'https://api.codetabs.com/v1/proxy?quest={url_medios}'
     
-    # Lista de medios asumiendo cerrado ("danger") por defecto
     medios_dict = {
         "eros1": {"nombre": "Eros 1", "aliases": ["Eros 1", "Eros I"], "tipo": "danger"},
         "eros2": {"nombre": "Eros 2", "aliases": ["Eros 2", "Eros II"], "tipo": "danger"},
@@ -83,26 +80,49 @@ def actualizar_rutas():
             res_m = requests.get(proxy_medios, timeout=15)
             html_m = res_m.text
             if "leñas" not in html_m.lower():
-                raise Exception("Fallo de proxy")
+                raise Exception()
         except:
             scraper_m = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
             html_m = scraper_m.get(url_medios).text
             
-        # Pasamos todo el HTML a minúsculas para escanearlo en bruto
         html_lower = html_m.lower()
         
+        # Diccionario con todas las formas posibles de "Abierto" y "Cerrado" en el código
+        keywords_ok = ['abierto', 'habilitado', 'check', 'verde', 'green', 'open', 'status-open', '✔', '✅', 'dot-green']
+        keywords_danger = ['cerrado', 'deshabilitado', 'cruz', 'rojo', 'red', 'closed', 'status-closed', 'fa-times', '❌', 'dot-red']
+
         for key, val in medios_dict.items():
             for alias in val["aliases"]:
-                alias_lower = alias.lower()
-                idx = html_lower.find(alias_lower)
+                idx = html_lower.find(alias.lower())
+                
                 if idx != -1:
-                    # Si encuentra el nombre, agarra un bloque de 250 caracteres antes y después del nombre
-                    window = html_lower[max(0, idx - 250) : min(len(html_lower), idx + 250)]
+                    # Si encuentra la telesilla, recorta un bloque del código a su alrededor
+                    start = max(0, idx - 250)
+                    end = min(len(html_lower), idx + 400)
+                    window = html_lower[start:end]
                     
-                    # Busca cualquier indicador de que está abierto en ese bloque cercano
-                    if any(pista in window for pista in ['abierto', 'habilitado', 'check', 'verde', 'green', 'open', 'status-open', 'icon-check']):
+                    # Calcula el punto exacto donde está el nombre
+                    center = idx - start
+                    
+                    # Mide qué tan cerca está una palabra de habilitado
+                    dist_ok = 9999
+                    for k in keywords_ok:
+                        for match in re.finditer(re.escape(k), window):
+                            d = abs(match.start() - center)
+                            if d < dist_ok: dist_ok = d
+                                
+                    # Mide qué tan cerca está una palabra de cerrado
+                    dist_danger = 9999
+                    for k in keywords_danger:
+                        for match in re.finditer(re.escape(k), window):
+                            d = abs(match.start() - center)
+                            if d < dist_danger: dist_danger = d
+                                
+                    # Compara distancias: la que esté más pegada al nombre de la pista, es el estado real.
+                    if dist_ok < dist_danger:
                         val["tipo"] = "ok"
-                    break # Si ya lo encontró, deja de buscar los otros aliases
+                    break
+                    
     except Exception as e:
         print(f"Error escaneando medios: {e}")
         
