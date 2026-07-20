@@ -41,42 +41,70 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Evitamos el Pull-to-Refresh blanco nativo de Chrome para usar el nuestro animado */
 html, body {
   height: 100%;
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   overflow: hidden;
-  overscroll-behavior-y: none; 
+  overscroll-behavior-y: none; /* Previene el refresh nativo blanco */
 }
 
 .app {
   display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; background: var(--bg);
-  position: relative;
 }
 
-/* El z-index: 10 hace que el encabezado tape a la bolita de actualizar */
-.hdr { background: var(--surface); padding: calc(var(--safe-t) + 20px) 20px 16px; flex-shrink: 0; position: relative; z-index: 10; }
+/* ── HEADER MÁS COMPACTO Y LIMPIO ── */
+.hdr { 
+  background: var(--surface); 
+  padding: calc(var(--safe-t) + 16px) 20px 16px; 
+  flex-shrink: 0; 
+  border-bottom: 1px solid var(--border);
+}
 .hdr-top { display: flex; align-items: center; gap: 14px; }
 .hdr-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.hdr-titles { display: flex; flex-direction: column; }
 .hdr-titles h1 { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
-.hdr-titles p  { font-size: 12px; color: var(--text2); margin-top: 2px; font-weight: 500; }
-.hdr-refresh { margin-left: auto; width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 20px; transition: all .2s ease; }
-.hdr-refresh:active { background: var(--border); transform: scale(0.95); }
 
-.status-banner { margin-top: 16px; display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--r-inner); font-size: 13px; font-weight: 500; background: var(--yellow-soft); color: var(--yellow); }
-.sb-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: #f29900; animation: pulse 2s infinite; }
-@keyframes pulse { 0% { transform: scale(0.95); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.5; } }
-
-.upill { margin-top: 10px; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); padding-left: 4px; }
+/* Actualizado ahora está pegado al título */
+.upill { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); margin-top: 4px; }
 .upill-dot { width: 6px; height: 6px; border-radius: 50%; background: #188038; }
 
-.content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px calc(var(--safe-b) + 30px); position: relative; z-index: 1; }
+.hdr-refresh { 
+  margin-left: auto; width: 40px; height: 40px; border-radius: 50%; 
+  background: var(--surface2); border: none; display: flex; align-items: center; justify-content: center; 
+  cursor: pointer; color: var(--text2); font-size: 20px; transition: background 0.2s; 
+}
+.hdr-refresh:active { background: var(--border); }
+#rf-icon { display: inline-block; transition: transform 0.1s ease-out; }
+
+/* ── CONTENIDO ── */
+.content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px calc(var(--safe-b) + 30px); }
 .slabel { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text2); margin: 24px 0 12px; padding-left: 4px; }
 
+/* ── BOTÓN PROTAGONISTA DE MEDIOS DE ELEVACIÓN ── */
+.hero-btn {
+  display: flex; align-items: center; gap: 16px;
+  background: linear-gradient(135deg, var(--blue) 0%, #1557b0 100%);
+  color: white; padding: 18px 20px; border-radius: var(--r);
+  text-decoration: none; margin-top: 20px;
+  box-shadow: 0 8px 24px rgba(26,115,232,0.25);
+  transition: transform 0.2s;
+}
+.hero-btn:active { transform: scale(0.97); }
+.hero-btn-icon {
+  font-size: 24px; width: 48px; height: 48px; border-radius: 14px;
+  background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.hero-btn-text { flex: 1; }
+.hero-btn-text strong { display: block; font-size: 16px; font-weight: 700; letter-spacing: 0.3px; }
+.hero-btn-text span { display: block; font-size: 13px; opacity: 0.9; margin-top: 2px; }
+.hero-btn-arrow { font-size: 24px; font-weight: 300; }
+
+
+/* ── RUTA 222 ── */
 .route-main { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; border: 1px solid var(--border); }
-.route-main-head { display: flex; flex-direction: column; gap: 14px; }
+.route-main-head { display: flex; flex-direction: column; gap: 16px; }
 .rh-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .rh-info-group { display: flex; align-items: center; gap: 12px; }
 .rh-icon { font-size: 28px; }
@@ -88,11 +116,13 @@ html, body {
 .chip.warn   { background: var(--yellow-soft); color: var(--yellow); }
 .chip.danger { background: var(--red-soft); color: var(--red); }
 
-.rh-detail-box { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-radius: var(--r-inner); font-size: 14px; line-height: 1.5; font-weight: 500; }
+/* Letra un poco más grande (15px) para mayor legibilidad */
+.rh-detail-box { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-radius: var(--r-inner); font-size: 15px; line-height: 1.5; font-weight: 500; }
 .rh-detail-box.warn   { background: linear-gradient(135deg, #fef7e0 0%, #fffbf0 100%); color: #663c00; border-left: 4px solid #f29900; }
 .rh-detail-box.danger { background: linear-gradient(135deg, #fce8e6 0%, #fff5f5 100%); color: #66120e; border-left: 4px solid #d93025; }
 .rh-detail-box.ok     { background: linear-gradient(135deg, #e6f4ea 0%, #f3faf5 100%); color: #0d421e; border-left: 4px solid #188038; }
 
+/* ── CLIMA ── */
 .weather-native { background: var(--surface); border-radius: var(--r-inner); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 16px; }
 .wx-current { display: flex; align-items: center; justify-content: flex-start; padding-bottom: 14px; margin-bottom: 10px; border-bottom: 1px solid var(--border); }
 .wxc-icon { font-size: 34px; margin-right: 14px; }
@@ -107,9 +137,9 @@ html, body {
 .wx-min { color: var(--text3); font-weight: 500; }
 .wx-max { color: var(--text); }
 
+/* ── LINKS OFICIALES ── */
 .link-card { background: var(--surface); border-radius: var(--r-inner); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
-.link-row { display: flex; align-items: center; gap: 14px; padding: 16px; text-decoration: none; color: inherit; border-bottom: 1px solid var(--border); }
-.link-row:last-child { border-bottom: none; }
+.link-row { display: flex; align-items: center; gap: 14px; padding: 16px; text-decoration: none; color: inherit; }
 .link-icon { width: 38px; height: 38px; border-radius: 12px; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; color: var(--blue); }
 .link-info { flex: 1; }
 .link-label { font-size: 14px; font-weight: 700; color: var(--text); }
@@ -117,64 +147,50 @@ html, body {
 .link-arrow { color: var(--text3); font-size: 18px; font-weight: 700; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
-.spinning { animation: spin .65s cubic-bezier(0.4, 0, 0.2, 1) infinite; display: inline-block; }
+.spinning { animation: spin .65s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
 
+/* ── BOTÓN INSTALAR ── */
 #install-btn {
-  display: none;
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   background: var(--blue); color: white; padding: 14px 24px; border-radius: 100px;
   font-family: 'Google Sans', sans-serif; font-size: 15px; font-weight: 700;
   box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4); border: none; cursor: pointer;
   align-items: center; gap: 8px; z-index: 1000; transition: transform 0.2s;
 }
 #install-btn:active { transform: translateX(-50%) scale(0.95); }
-
-/* ESTILOS DE LA BOLITA DE PULL-TO-REFRESH */
-#ptr {
-  position: absolute;
-  top: 160px; /* Queda escondido detrás del encabezado */
-  left: 50%;
-  transform: translate(-50%, -50px); 
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: var(--surface);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; color: var(--blue);
-  z-index: 5; /* Por debajo del header, por arriba del contenido */
-  opacity: 0;
-  pointer-events: none;
-}
 </style>
 </head>
 <body>
 
 <div class="app">
-  <!-- BOLITA DE ACTUALIZAR (Oculta al principio) -->
-  <div id="ptr">↻</div>
-
   <header class="hdr">
     <div class="hdr-top">
       <div class="hdr-icon">🏔️</div>
       <div class="hdr-titles">
         <h1>Rutas a Las Leñas</h1>
-        <p>Mendoza · Estado en tiempo real</p>
+        <div class="upill">
+          <div class="upill-dot"></div>
+          <span>Actualizado: <strong id="utime">—</strong></span>
+        </div>
       </div>
       <button class="hdr-refresh" onclick="refresh()" title="Actualizar">
         <span id="rf-icon">↻</span>
       </button>
     </div>
-    <div class="status-banner warn">
-      <div class="sb-dot"></div>
-      <span>Acceso con restricciones — verificá antes de salir</span>
-    </div>
-    <div class="upill">
-      <div class="upill-dot"></div>
-      <span>Actualizado: <strong id="utime">—</strong></span>
-    </div>
   </header>
 
   <div class="content" id="scroll-area">
+    
+    <!-- NUEVO BOTÓN DESTACADO PARA PISTAS -->
+    <a href="https://laslenas.com/estado-pistas/medios/" target="_blank" class="hero-btn">
+      <div class="hero-btn-icon">⛷️</div>
+      <div class="hero-btn-text">
+        <strong>Pistas y Medios</strong>
+        <span>Consultar reporte oficial en vivo</span>
+      </div>
+      <div class="hero-btn-arrow">›</div>
+    </a>
+
     <div class="slabel">Ruta principal de acceso</div>
     <div class="route-main">
       <div class="route-main-head">
@@ -200,16 +216,8 @@ html, body {
       <div style="padding: 10px; text-align: center; color: var(--text2);">Cargando pronóstico...</div>
     </div>
 
-    <div class="slabel">Información oficial</div>
+    <div class="slabel">Información de Vialidad</div>
     <div class="link-card">
-      <a class="link-row" href="https://laslenas.com/estado-pistas/medios/" target="_blank">
-        <div class="link-icon">⛷️</div>
-        <div class="link-info">
-          <div class="link-label">Medios de Elevación</div>
-          <div class="link-sub">Consultar estado oficial de pistas</div>
-        </div>
-        <span class="link-arrow">›</span>
-      </a>
       <a class="link-row" href="https://prensa.mendoza.gob.ar/estado-de-las-rutas-en-mendoza-2/" target="_blank">
         <div class="link-icon">🏛️</div>
         <div class="link-info">
@@ -233,7 +241,6 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   });
 }
-
 let promptInstalacion;
 const btnInstalar = document.getElementById('install-btn');
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -248,18 +255,16 @@ btnInstalar.addEventListener('click', async () => {
   promptInstalacion = null;
 });
 
-
-// ── LÓGICA DE PULL-TO-REFRESH ──
+// ── PULL-TO-REFRESH SUTIL (Animación en el botón nativo) ──
 const contentEl = document.getElementById('scroll-area');
-const ptrEl = document.getElementById('ptr');
+const rfIcon = document.getElementById('rf-icon');
 let startY = 0, currentY = 0, isPulling = false;
 
 contentEl.addEventListener('touchstart', (e) => {
-  // Solo se activa si estamos arriba del todo
   if (contentEl.scrollTop === 0) {
     startY = e.touches[0].clientY;
     isPulling = true;
-    ptrEl.style.transition = 'none';
+    rfIcon.style.transition = 'none'; // Quita la transición para que siga al dedo al instante
   }
 }, {passive: true});
 
@@ -268,12 +273,11 @@ contentEl.addEventListener('touchmove', (e) => {
   currentY = e.touches[0].clientY;
   const pullDist = currentY - startY;
 
-  // Si está arrastrando hacia abajo
+  // Si tiramos hacia abajo
   if (pullDist > 0 && contentEl.scrollTop === 0) {
-    if (e.cancelable) e.preventDefault(); // Evita el scroll elástico de Android
-    const visualDist = Math.min(pullDist * 0.4, 70); // Efecto goma
-    ptrEl.style.transform = `translate(-50%, calc(-50px + ${visualDist}px)) rotate(${pullDist}deg)`;
-    ptrEl.style.opacity = visualDist / 50;
+    if (e.cancelable) e.preventDefault();
+    // Hacemos girar el iconito superior en tiempo real según cuánto arrastres
+    rfIcon.style.transform = `rotate(${pullDist * 2}deg)`;
   }
 }, {passive: false});
 
@@ -281,31 +285,20 @@ contentEl.addEventListener('touchend', () => {
   if (!isPulling) return;
   isPulling = false;
   const pullDist = currentY - startY;
-  ptrEl.style.transition = 'transform 0.3s, opacity 0.3s';
-
-  // Si tiró lo suficiente (más de 100px físicos)
-  if (pullDist > 100) {
-    ptrEl.style.transform = `translate(-50%, 15px)`;
-    ptrEl.classList.add('spinning');
-    
-    refresh(); // Llama a tu función de actualización
-    
-    // Lo esconde después de 1 segundo (mientras los datos cargan)
-    setTimeout(() => {
-      ptrEl.style.transform = `translate(-50%, -50px)`;
-      ptrEl.style.opacity = '0';
-      ptrEl.classList.remove('spinning');
-    }, 1000);
+  
+  // Si tiraste lo suficiente, ejecutamos la recarga completa
+  if (pullDist > 80) {
+    rfIcon.style.transform = ''; // Limpiamos la rotación en línea
+    refresh(); // Acá se le agrega la clase .spinning automáticamente
   } else {
-    // Si se arrepintió y no tiró hasta abajo
-    ptrEl.style.transform = `translate(-50%, -50px)`;
-    ptrEl.style.opacity = '0';
+    // Si te arrepentiste, vuelve a su posición original suavemente
+    rfIcon.style.transition = 'transform 0.3s ease-out';
+    rfIcon.style.transform = `rotate(0deg)`;
   }
   startY = 0; currentY = 0;
 });
 
-
-// ── LÓGICA DE DATOS (CLIMA Y RUTAS) ──
+// ── LÓGICA DE DATOS ──
 function setTime() {
   const n = new Date();
   const h = String(n.getHours()).padStart(2,'0');
@@ -316,6 +309,7 @@ function setTime() {
 
 function refresh() {
   const ic = document.getElementById('rf-icon');
+  ic.style.transition = ''; // Limpia transiciones manuales
   ic.classList.add('spinning');
   loadWeather(); loadRouteStatus();
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 750);
@@ -323,7 +317,6 @@ function refresh() {
 
 async function loadRouteStatus() {
   try {
-    // El "?t=" fuerza a no usar el caché viejo
     const res = await fetch('./estado.json?t=' + new Date().getTime());
     const data = await res.json();
     
