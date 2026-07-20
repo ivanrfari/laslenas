@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
 <title>Rutas — Las Leñas</title>
+
+<!-- CONEXIÓN AL MANIFEST (El ID de la app) -->
+<link rel="manifest" href="manifest.json">
+<!-- Ícono para iPhone (Safari) -->
+<link rel="apple-touch-icon" href="https://fonts.gstatic.com/s/e/notoemoji/latest/26f0_fe0f/512.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -48,27 +54,15 @@ html, body {
   display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; background: var(--bg);
 }
 
-.hdr {
-  background: var(--surface); padding: calc(var(--safe-t) + 20px) 20px 16px; flex-shrink: 0;
-}
+.hdr { background: var(--surface); padding: calc(var(--safe-t) + 20px) 20px 16px; flex-shrink: 0; }
 .hdr-top { display: flex; align-items: center; gap: 14px; }
-.hdr-icon {
-  width: 44px; height: 44px; border-radius: 14px; background: var(--blue-soft);
-  display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
-}
+.hdr-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
 .hdr-titles h1 { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
 .hdr-titles p  { font-size: 12px; color: var(--text2); margin-top: 2px; font-weight: 500; }
-.hdr-refresh {
-  margin-left: auto; width: 40px; height: 40px; border-radius: 50%;
-  background: var(--surface2); border: none; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text2); font-size: 20px; transition: all .2s ease;
-}
+.hdr-refresh { margin-left: auto; width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 20px; transition: all .2s ease; }
 .hdr-refresh:active { background: var(--border); transform: scale(0.95); }
 
-.status-banner {
-  margin-top: 16px; display: flex; align-items: center; gap: 10px; padding: 12px 16px;
-  border-radius: var(--r-inner); font-size: 13px; font-weight: 500; background: var(--yellow-soft); color: var(--yellow);
-}
+.status-banner { margin-top: 16px; display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--r-inner); font-size: 13px; font-weight: 500; background: var(--yellow-soft); color: var(--yellow); }
 .sb-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: #f29900; animation: pulse 2s infinite; }
 @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.5; } }
 
@@ -78,7 +72,6 @@ html, body {
 .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px calc(var(--safe-b) + 30px); }
 .slabel { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text2); margin: 24px 0 12px; padding-left: 4px; }
 
-/* ── HERO HIGH-IMPACT CARD (RP 222) ── */
 .route-main { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; border: 1px solid var(--border); }
 .route-main-head { display: flex; flex-direction: column; gap: 14px; }
 .rh-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -97,7 +90,6 @@ html, body {
 .rh-detail-box.danger { background: linear-gradient(135deg, #fce8e6 0%, #fff5f5 100%); color: #66120e; border-left: 4px solid #d93025; }
 .rh-detail-box.ok     { background: linear-gradient(135deg, #e6f4ea 0%, #f3faf5 100%); color: #0d421e; border-left: 4px solid #188038; }
 
-/* ── NATIVE WEATHER WIDGET ── */
 .weather-native { background: var(--surface); border-radius: var(--r-inner); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 16px; }
 .wx-current { display: flex; align-items: center; justify-content: flex-start; padding-bottom: 14px; margin-bottom: 10px; border-bottom: 1px solid var(--border); }
 .wxc-icon { font-size: 34px; margin-right: 14px; }
@@ -112,7 +104,6 @@ html, body {
 .wx-min { color: var(--text3); font-weight: 500; }
 .wx-max { color: var(--text); }
 
-/* ── LINKS OFICIALES ── */
 .link-card { background: var(--surface); border-radius: var(--r-inner); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
 .link-row { display: flex; align-items: center; gap: 14px; padding: 16px; text-decoration: none; color: inherit; border-bottom: 1px solid var(--border); }
 .link-row:last-child { border-bottom: none; }
@@ -124,6 +115,30 @@ html, body {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinning { animation: spin .65s cubic-bezier(0.4, 0, 0.2, 1) infinite; display: inline-block; }
+
+/* ── BOTÓN FLOTANTE PARA INSTALAR ── */
+#install-btn {
+  display: none; /* Oculto por defecto, Chrome lo muestra si es compatible */
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--blue);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 100px;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4);
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+  transition: transform 0.2s;
+}
+#install-btn:active { transform: translateX(-50%) scale(0.95); }
 </style>
 </head>
 <body>
@@ -198,7 +213,43 @@ html, body {
   </div>
 </div>
 
+<!-- BOTÓN FLOTANTE QUE SE ACTIVA EN ANDROID -->
+<button id="install-btn">
+  <span style="font-size: 18px;">📲</span> Instalar como App
+</button>
+
 <script>
+// 1. REGISTRO DEL MOTOR DE LA APP (Service Worker)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('App registrada con éxito'))
+      .catch(err => console.error('Error registrando app', err));
+  });
+}
+
+// 2. LÓGICA DEL BOTÓN DE INSTALACIÓN
+let promptInstalacion;
+const btnInstalar = document.getElementById('install-btn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Evita que Chrome muestre el cartel blanco feo por defecto
+  e.preventDefault();
+  // Guardamos el evento para dispararlo cuando toquen el botón
+  promptInstalacion = e;
+  // Mostramos nuestro botón azul elegante
+  btnInstalar.style.display = 'flex';
+});
+
+btnInstalar.addEventListener('click', async () => {
+  btnInstalar.style.display = 'none';
+  // Lanza la ventana oficial de Android para instalar
+  promptInstalacion.prompt();
+  const resultado = await promptInstalacion.userChoice;
+  promptInstalacion = null;
+});
+
+// 3. LÓGICA DE RUTAS Y CLIMA (La que ya tenías)
 function setTime() {
   const n = new Date();
   const h = String(n.getHours()).padStart(2,'0');
