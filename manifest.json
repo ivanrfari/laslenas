@@ -1,14 +1,17 @@
 {
-  "name": "Rutas — Las Leñas",
+  "name": "Rutas Las Leñas",
   "short_name": "Las Leñas",
-  "description": "Estado de rutas en tiempo real para ir a Las Leñas, Mendoza",
   "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#f8f9fa",
+  "background_color": "#fdfdfd",
   "theme_color": "#ffffff",
+  "description": "Estado de rutas y clima en tiempo real.",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/26f0_fe0f/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
