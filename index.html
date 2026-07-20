@@ -6,9 +6,8 @@
 <meta name="theme-color" content="#ffffff">
 <title>Rutas — Las Leñas</title>
 
-<!-- CONEXIÓN AL MANIFEST (El ID de la app) -->
+<!-- CONEXIÓN AL MANIFEST PARA INSTALAR LA APP -->
 <link rel="manifest" href="manifest.json">
-<!-- Ícono para iPhone (Safari) -->
 <link rel="apple-touch-icon" href="https://fonts.gstatic.com/s/e/notoemoji/latest/26f0_fe0f/512.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,19 +41,23 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Evitamos el Pull-to-Refresh blanco nativo de Chrome para usar el nuestro animado */
 html, body {
   height: 100%;
   font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   overflow: hidden;
+  overscroll-behavior-y: none; 
 }
 
 .app {
   display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; background: var(--bg);
+  position: relative;
 }
 
-.hdr { background: var(--surface); padding: calc(var(--safe-t) + 20px) 20px 16px; flex-shrink: 0; }
+/* El z-index: 10 hace que el encabezado tape a la bolita de actualizar */
+.hdr { background: var(--surface); padding: calc(var(--safe-t) + 20px) 20px 16px; flex-shrink: 0; position: relative; z-index: 10; }
 .hdr-top { display: flex; align-items: center; gap: 14px; }
 .hdr-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
 .hdr-titles h1 { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
@@ -69,7 +72,7 @@ html, body {
 .upill { margin-top: 10px; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); padding-left: 4px; }
 .upill-dot { width: 6px; height: 6px; border-radius: 50%; background: #188038; }
 
-.content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px calc(var(--safe-b) + 30px); }
+.content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px calc(var(--safe-b) + 30px); position: relative; z-index: 1; }
 .slabel { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text2); margin: 24px 0 12px; padding-left: 4px; }
 
 .route-main { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; border: 1px solid var(--border); }
@@ -116,34 +119,40 @@ html, body {
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinning { animation: spin .65s cubic-bezier(0.4, 0, 0.2, 1) infinite; display: inline-block; }
 
-/* ── BOTÓN FLOTANTE PARA INSTALAR ── */
 #install-btn {
-  display: none; /* Oculto por defecto, Chrome lo muestra si es compatible */
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--blue);
-  color: white;
-  padding: 14px 24px;
-  border-radius: 100px;
-  font-family: 'Google Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4);
-  border: none;
-  cursor: pointer;
-  align-items: center;
-  gap: 8px;
-  z-index: 1000;
-  transition: transform 0.2s;
+  display: none;
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--blue); color: white; padding: 14px 24px; border-radius: 100px;
+  font-family: 'Google Sans', sans-serif; font-size: 15px; font-weight: 700;
+  box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4); border: none; cursor: pointer;
+  align-items: center; gap: 8px; z-index: 1000; transition: transform 0.2s;
 }
 #install-btn:active { transform: translateX(-50%) scale(0.95); }
+
+/* ESTILOS DE LA BOLITA DE PULL-TO-REFRESH */
+#ptr {
+  position: absolute;
+  top: 160px; /* Queda escondido detrás del encabezado */
+  left: 50%;
+  transform: translate(-50%, -50px); 
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: var(--blue);
+  z-index: 5; /* Por debajo del header, por arriba del contenido */
+  opacity: 0;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
 
 <div class="app">
+  <!-- BOLITA DE ACTUALIZAR (Oculta al principio) -->
+  <div id="ptr">↻</div>
+
   <header class="hdr">
     <div class="hdr-top">
       <div class="hdr-icon">🏔️</div>
@@ -165,7 +174,7 @@ html, body {
     </div>
   </header>
 
-  <div class="content">
+  <div class="content" id="scroll-area">
     <div class="slabel">Ruta principal de acceso</div>
     <div class="route-main">
       <div class="route-main-head">
@@ -213,43 +222,90 @@ html, body {
   </div>
 </div>
 
-<!-- BOTÓN FLOTANTE QUE SE ACTIVA EN ANDROID -->
 <button id="install-btn">
   <span style="font-size: 18px;">📲</span> Instalar como App
 </button>
 
 <script>
-// 1. REGISTRO DEL MOTOR DE LA APP (Service Worker)
+// ── REGISTRO PWA ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('App registrada con éxito'))
-      .catch(err => console.error('Error registrando app', err));
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
   });
 }
 
-// 2. LÓGICA DEL BOTÓN DE INSTALACIÓN
 let promptInstalacion;
 const btnInstalar = document.getElementById('install-btn');
-
 window.addEventListener('beforeinstallprompt', (e) => {
-  // Evita que Chrome muestre el cartel blanco feo por defecto
   e.preventDefault();
-  // Guardamos el evento para dispararlo cuando toquen el botón
   promptInstalacion = e;
-  // Mostramos nuestro botón azul elegante
   btnInstalar.style.display = 'flex';
 });
-
 btnInstalar.addEventListener('click', async () => {
   btnInstalar.style.display = 'none';
-  // Lanza la ventana oficial de Android para instalar
   promptInstalacion.prompt();
-  const resultado = await promptInstalacion.userChoice;
+  await promptInstalacion.userChoice;
   promptInstalacion = null;
 });
 
-// 3. LÓGICA DE RUTAS Y CLIMA (La que ya tenías)
+
+// ── LÓGICA DE PULL-TO-REFRESH ──
+const contentEl = document.getElementById('scroll-area');
+const ptrEl = document.getElementById('ptr');
+let startY = 0, currentY = 0, isPulling = false;
+
+contentEl.addEventListener('touchstart', (e) => {
+  // Solo se activa si estamos arriba del todo
+  if (contentEl.scrollTop === 0) {
+    startY = e.touches[0].clientY;
+    isPulling = true;
+    ptrEl.style.transition = 'none';
+  }
+}, {passive: true});
+
+contentEl.addEventListener('touchmove', (e) => {
+  if (!isPulling) return;
+  currentY = e.touches[0].clientY;
+  const pullDist = currentY - startY;
+
+  // Si está arrastrando hacia abajo
+  if (pullDist > 0 && contentEl.scrollTop === 0) {
+    if (e.cancelable) e.preventDefault(); // Evita el scroll elástico de Android
+    const visualDist = Math.min(pullDist * 0.4, 70); // Efecto goma
+    ptrEl.style.transform = `translate(-50%, calc(-50px + ${visualDist}px)) rotate(${pullDist}deg)`;
+    ptrEl.style.opacity = visualDist / 50;
+  }
+}, {passive: false});
+
+contentEl.addEventListener('touchend', () => {
+  if (!isPulling) return;
+  isPulling = false;
+  const pullDist = currentY - startY;
+  ptrEl.style.transition = 'transform 0.3s, opacity 0.3s';
+
+  // Si tiró lo suficiente (más de 100px físicos)
+  if (pullDist > 100) {
+    ptrEl.style.transform = `translate(-50%, 15px)`;
+    ptrEl.classList.add('spinning');
+    
+    refresh(); // Llama a tu función de actualización
+    
+    // Lo esconde después de 1 segundo (mientras los datos cargan)
+    setTimeout(() => {
+      ptrEl.style.transform = `translate(-50%, -50px)`;
+      ptrEl.style.opacity = '0';
+      ptrEl.classList.remove('spinning');
+    }, 1000);
+  } else {
+    // Si se arrepintió y no tiró hasta abajo
+    ptrEl.style.transform = `translate(-50%, -50px)`;
+    ptrEl.style.opacity = '0';
+  }
+  startY = 0; currentY = 0;
+});
+
+
+// ── LÓGICA DE DATOS (CLIMA Y RUTAS) ──
 function setTime() {
   const n = new Date();
   const h = String(n.getHours()).padStart(2,'0');
@@ -267,6 +323,7 @@ function refresh() {
 
 async function loadRouteStatus() {
   try {
+    // El "?t=" fuerza a no usar el caché viejo
     const res = await fetch('./estado.json?t=' + new Date().getTime());
     const data = await res.json();
     
@@ -285,7 +342,7 @@ async function loadRouteStatus() {
       box222.className = 'rh-detail-box ok';
     }
   } catch(e) {
-    document.getElementById('txt-222').textContent = "Esperando la primera actualización de rutas...";
+    document.getElementById('txt-222').textContent = "Esperando actualización...";
   }
 }
 
