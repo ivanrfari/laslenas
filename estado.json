@@ -1,6 +1,6 @@
 {
   "rp222": {
-    "texto": "RP 89 Vallecitos: Atención: Nieva fuerte, mucha precaución, solo 4×4 y uso obligatorio de cadenas. RP 222 a Las Leñas: Transitable, portación y uso obligatorio de cadenas en tramos con hielo. Intransitables: RP 52 entre Villavicencio y Uspallata; RP 13 entre Agua de Chilcas y el Cerro 7 Colores; RP 220 entre el arroyo Blanco y el Hotel Abandonado, y RP 226, entre Las Loicas y El Planchón.",
-    "tipo": "danger"
+    "texto": "RP 222 a Las Leñas: Transitable, portación y uso obligatorio de cadenas en tramos con hielo.",
+    "tipo": "warn"
   }
 }
