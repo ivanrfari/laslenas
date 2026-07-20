@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<!-- Estas dos líneas solucionan el error del reloj y la batería invisible -->
 <meta name="theme-color" content="#F2F4F8">
 <meta name="color-scheme" content="light">
 
@@ -16,7 +15,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* ── DISEÑO INNOVADOR "BENTO UI" ── */
 :root {
   --bg: #F2F4F8;
   --surface: #FFFFFF;
@@ -30,58 +28,39 @@
   --orange-light: #FFFBEB;
   --red: #EF4444;
   --red-light: #FEF2F2;
-  --radius: 28px; /* Bordes súper redondeados y modernos */
+  --radius: 28px;
   --safe-t: env(safe-area-inset-top, 0px);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
 html, body {
-  height: 100%;
-  background: var(--bg);
-  color: var(--text);
-  overflow: hidden;
-  overscroll-behavior-y: none;
+  height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior-y: none;
 }
 
-.app {
-  display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto;
-}
+.app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; }
 
-/* ── ENCABEZADO MINIMALISTA ── */
-.header {
-  padding: calc(var(--safe-t) + 20px) 24px 10px;
-  display: flex; justify-content: space-between; align-items: center;
-}
+/* ── ENCABEZADO ── */
+.header { padding: calc(var(--safe-t) + 20px) 24px 10px; display: flex; justify-content: space-between; align-items: center; }
 .header-title h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
 .header-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
 .dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; }
 
 .btn-refresh {
   width: 48px; height: 48px; border-radius: 16px; background: var(--surface);
-  border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-  display: flex; align-items: center; justify-content: center; font-size: 20px;
+  border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: center; font-size: 20px;
   color: var(--text); cursor: pointer;
 }
 #rf-icon { transition: transform 0.1s ease-out; }
 .spinning { animation: spin 0.6s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── ZONA DE SCROLL (Contenido) ── */
-.scroll-area {
-  flex: 1; overflow-y: auto; padding: 10px 20px 40px;
-  display: flex; flex-direction: column; gap: 16px;
-}
-
-/* ── TARJETAS ESTILO "BENTO" ── */
-.bento-card {
-  background: var(--surface); border-radius: var(--radius);
-  padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.03);
-}
-
+/* ── CONTENIDO ── */
+.scroll-area { flex: 1; overflow-y: auto; padding: 10px 20px 40px; display: flex; flex-direction: column; gap: 16px; }
+.bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.03); }
 .card-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 16px; }
 
-/* Tarjeta Ruta */
+/* ── TARJETA RUTA ── */
 .ruta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .ruta-name { font-size: 24px; font-weight: 800; }
 .ruta-chip { padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 700; }
@@ -90,7 +69,7 @@ html, body {
 .chip-danger { background: var(--red-light); color: var(--red); }
 .ruta-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); font-weight: 500; }
 
-/* Tarjeta Clima */
+/* ── TARJETA CLIMA ── */
 .weather-main { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #F3F4F6; }
 .w-icon { font-size: 42px; }
 .w-temp { font-size: 36px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
@@ -100,30 +79,40 @@ html, body {
 .wg-icon { font-size: 20px; margin: 6px 0; }
 .wg-temps { font-size: 13px; font-weight: 700; color: var(--text-muted); }
 
-/* ── MÁSCARA DE RECORTE (IFRAME PISTAS) ── */
+/* ========================================================
+   MÁSCARA DE RECORTE (TIJERAS PARA PISTAS)
+   ======================================================== */
 .iframe-viewport {
   width: 100%;
-  height: 400px; /* La altura del recuadro que vas a ver en tu app */
+  height: 400px; /* Alto de la ventanita visible en tu pantalla */
   border-radius: var(--radius);
-  overflow-y: auto; /* Te permite deslizar hacia abajo en la tabla */
+  overflow-y: auto; /* Permite que deslices el dedo hacia abajo */
   overflow-x: hidden;
   background: var(--surface);
   box-shadow: 0 8px 30px rgba(0,0,0,0.03);
   position: relative;
 }
+
 .iframe-clipper {
   width: 100%;
-  height: 1800px; /* Le damos mucho espacio para que quepan todos los medios */
   position: relative;
+  overflow: hidden; /* Todo lo que se pase de esta altura, se corta (Publicidades) */
+  /* ↓↓↓ AJUSTE DE CORTE INFERIOR ↓↓↓ */
+  /* Si ves la publicidad, achicá este número. Si se te corta Sogalift, agrandalo. */
+  height: 980px; 
 }
+
 .iframe-clipper iframe {
   position: absolute;
-  top: -460px; /* MAGIA: Desplaza la página de ellos 460px hacia arriba para esconder el logo */
   left: 0;
   width: 100%;
-  height: 2500px;
+  height: 3000px;
   border: none;
-  pointer-events: none; /* MAGIA 2: Evita que toques botones de su web por accidente */
+  pointer-events: none; /* Evita toques falsos */
+  /* ↓↓↓ AJUSTE DE CORTE SUPERIOR ↓↓↓ */
+  /* Si todavía ves el cuadro azul, poné un número más negativo (ej: -720px). */
+  /* Si se corta la palabra "Medios", poné un número menos negativo (ej: -660px). */
+  top: -695px; 
 }
 
 /* ── BOTÓN INSTALAR ── */
@@ -138,7 +127,6 @@ html, body {
 <body>
 
 <div class="app">
-  
   <header class="header">
     <div class="header-title">
       <h1>Las Leñas</h1>
@@ -154,7 +142,6 @@ html, body {
 
   <div class="scroll-area" id="scroll-area">
     
-    <!-- TARJETA RUTA -->
     <div class="bento-card">
       <div class="card-title">Acceso principal</div>
       <div class="ruta-header">
@@ -164,7 +151,6 @@ html, body {
       <div class="ruta-text" id="txt-222">Conectando con el servidor...</div>
     </div>
 
-    <!-- TARJETA CLIMA -->
     <div class="bento-card">
       <div class="card-title">Pronóstico de la montaña</div>
       <div id="wx-container">
@@ -172,12 +158,11 @@ html, body {
       </div>
     </div>
 
-    <!-- TARJETA MEDIOS DE ELEVACIÓN RECORTADA -->
+    <!-- TARJETA RECORTADA -->
     <div>
-      <div class="card-title" style="margin-left: 8px;">Estado de Medios (En vivo)</div>
+      <div class="card-title" style="margin-left: 8px;">Medios de Elevación</div>
       <div class="iframe-viewport">
         <div class="iframe-clipper">
-          <!-- Si la tabla te queda muy arriba o muy abajo, podés cambiar el valor de "top: -460px" en el CSS -->
           <iframe src="https://laslenas.com/estado-pistas/medios/" scrolling="no"></iframe>
         </div>
       </div>
@@ -195,7 +180,7 @@ let promptInstalacion; const btnInstalar = document.getElementById('install-btn'
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptInstalacion = e; btnInstalar.style.display = 'flex'; });
 btnInstalar.addEventListener('click', async () => { btnInstalar.style.display = 'none'; promptInstalacion.prompt(); await promptInstalacion.userChoice; promptInstalacion = null; });
 
-// ── PULL-TO-REFRESH ESTILIZADO ──
+// ── PULL-TO-REFRESH ──
 const contentEl = document.getElementById('scroll-area');
 const rfIcon = document.getElementById('rf-icon');
 let startY = 0, currentY = 0, isPulling = false;
@@ -231,6 +216,9 @@ function refresh() {
   const ic = document.getElementById('rf-icon');
   ic.style.transition = ''; ic.classList.add('spinning');
   loadWeather(); loadRouteStatus();
+  // Engañamos al iframe obligándolo a recargarse para obtener los datos de medios frescos
+  const iframe = document.querySelector('iframe');
+  iframe.src = iframe.src; 
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 800);
 }
 
