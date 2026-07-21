@@ -87,7 +87,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 }
 .iframe-scaler {
   width: 400px; 
-  height: 630px; /* VALOR DEFINITIVO FINAL: 30px menos para volar las puntas de los logos */
+  height: 615px; /* VALOR DEFINITIVO FINAL: 615px para limpiar el borde de los logos */
   position: relative;
   transform-origin: top left;
 }
@@ -166,8 +166,8 @@ function ajustarIframeUniversal() {
   if(viewport && scaler) {
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    // Valor actualizado a 640px en el javascript también
-    viewport.style.height = (640 * scale) + 'px'; 
+    // Valor actualizado a 615px en el javascript también
+    viewport.style.height = (615 * scale) + 'px'; 
   }
 }
 window.addEventListener('resize', ajustarIframeUniversal);
