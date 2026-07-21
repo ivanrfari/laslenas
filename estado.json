@@ -1,6 +1,6 @@
 {
   "rp222": {
-    "texto": "RP 222 a Las Leñas: Transitable hasta Gendarmería.",
-    "tipo": "ok"
+    "texto": "RP 222 a Las Leñas:",
+    "tipo": "warn"
   }
 }
