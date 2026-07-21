@@ -76,7 +76,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .wg-temps { font-size: 13px; font-weight: 700; color: var(--text-muted); }
 .wg-snow { font-size: 12px; font-weight: 800; color: var(--accent); margin-top: 6px; height: 16px; }
 
-/* ── MÁSCARA DE RECORTE UNIVERSAL ("IFRAME CONGELADO") ── */
+/* ── MÁSCARA DE RECORTE UNIVERSAL (CORTE EXACTO) ── */
 .iframe-viewport {
   width: 100%; 
   border-radius: var(--radius); 
@@ -84,22 +84,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   background: var(--surface); 
   box-shadow: 0 8px 30px rgba(0,0,0,0.03);
   position: relative;
-  /* La altura será calculada por Javascript para mantener la proporción exacta */
 }
 .iframe-scaler {
-  width: 400px; /* Ancho simulado universal. Jamás cambia sin importar el celular. */
-  height: 800px; /* ← AJUSTE 1: Cortar publicidades de ABAJO. Si ves la publicidad, bajá este número (ej: 1000px) */
+  width: 400px; 
+  height: 800px; /* VALOR EXACTO: Corta justo debajo del último medio de elevación */
   position: relative;
   transform-origin: top left;
 }
 .iframe-scaler iframe {
-  width: 400px; /* Obliga a la página a verse como en un celular de 400px */
+  width: 400px; 
   height: 3000px;
   position: absolute;
-  top: -710px; /* ← AJUSTE 2: Cortar bloque azul de ARRIBA. Si asoma el cartel azul, ponelo más negativo (ej: -720px) */
+  top: -720px; /* VALOR EXACTO: Esconde el cuadro azul de arriba al milímetro */
   left: 0;
   border: none; 
-  pointer-events: none; /* Bloquea clics accidentales */
+  pointer-events: none; 
 }
 
 /* ── BOTÓN INSTALAR ── */
@@ -161,16 +160,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 
 <script>
 // ── MOTOR DE ESCALADO UNIVERSAL ──
-// Esto hace que el recorte de 400px se agrande o se achique para calzar perfecto en la pantalla del usuario.
 function ajustarIframeUniversal() {
   const viewport = document.getElementById('iframe-viewport');
   const scaler = document.getElementById('iframe-scaler');
   if(viewport && scaler) {
-    // Escala = Ancho de la pantalla real / 400px
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    // Adapta el alto del contenedor al nuevo tamaño escalado
-    viewport.style.height = (1030 * scale) + 'px'; // *NOTA: Si cambias el height del CSS, cambialo acá también.
+    // Valor exacto de altura replicado acá: 800px
+    viewport.style.height = (800 * scale) + 'px'; 
   }
 }
 window.addEventListener('resize', ajustarIframeUniversal);
@@ -215,7 +212,6 @@ function refresh() {
   const ic = document.getElementById('rf-icon');
   ic.style.transition = ''; ic.classList.add('spinning');
   loadWeather(); loadRouteStatus();
-  // Recarga el iframe original
   const elIframe = document.getElementById('m-iframe');
   elIframe.src = elIframe.src; 
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 1200);
