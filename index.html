@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- ACÁ ESTÁ EL BLOQUEO DE ZOOM: user-scalable=no y maximum-scale=1.0 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-<!-- Acá está el cambio a NEGRO PURO -->
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="light">
 
@@ -35,7 +35,8 @@
   --safe-t: env(safe-area-inset-top, 0px);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+/* touch-action: manipulation desactiva el doble toque para hacer zoom y el pellizco en navegadores rebeldes como Safari */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; touch-action: manipulation; }
 
 html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior-y: none; }
 
