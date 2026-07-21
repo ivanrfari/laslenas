@@ -87,7 +87,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 }
 .iframe-scaler {
   width: 400px; 
-  height: 670px; /* VALOR DEFINITIVO: Corta exactamente a los 670px, eliminando los logos de Mastercard, BNA y Corona */
+  height: 640px; /* VALOR DEFINITIVO FINAL: 30px menos para volar las puntas de los logos */
   position: relative;
   transform-origin: top left;
 }
@@ -166,8 +166,8 @@ function ajustarIframeUniversal() {
   if(viewport && scaler) {
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    // Valor actualizado a 670px para que coincida exactamente con el CSS
-    viewport.style.height = (670 * scale) + 'px'; 
+    // Valor actualizado a 640px en el javascript también
+    viewport.style.height = (640 * scale) + 'px'; 
   }
 }
 window.addEventListener('resize', ajustarIframeUniversal);
