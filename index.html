@@ -3,13 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#F2F4F8">
+<!-- SOLUCIÓN ÍCONOS BLANCOS: Forzamos el tema a blanco puro para que Android ponga los íconos negros -->
+<meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light">
 
 <title>Rutas — Las Leñas</title>
 
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="https://fonts.gstatic.com/s/e/notoemoji/latest/26f0_fe0f/512.png">
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="apple-touch-icon" href="logo.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
@@ -37,10 +40,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 
 .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; }
 
-/* ── ENCABEZADO ── */
+/* ── ENCABEZADO CON LOGO ── */
 .header { padding: calc(var(--safe-t) + 20px) 24px 10px; display: flex; justify-content: space-between; align-items: center; }
-.header-title h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-.header-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.header-title { display: flex; flex-direction: column; justify-content: center; }
+.main-logo { height: 42px; object-fit: contain; margin-bottom: 4px; }
+.header-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; }
 
 .btn-refresh {
@@ -74,7 +78,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .wg-day { font-size: 13px; font-weight: 800; color: var(--text); }
 .wg-icon { font-size: 20px; margin: 6px 0; }
 .wg-temps { font-size: 13px; font-weight: 700; color: var(--text-muted); }
-.wg-snow { font-size: 12px; font-weight: 800; color: var(--accent); margin-top: 6px; height: 16px; }
+.wg-snow { font-size: 13px; font-weight: 800; color: var(--accent); margin-top: 6px; height: 16px; }
 
 /* ── MÁSCARA DE RECORTE UNIVERSAL (CORTE EXACTO) ── */
 .iframe-viewport {
@@ -87,7 +91,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 }
 .iframe-scaler {
   width: 400px; 
-  height: 615px; /* VALOR DEFINITIVO FINAL: 615px para limpiar el borde de los logos */
+  height: 615px; 
   position: relative;
   transform-origin: top left;
 }
@@ -101,11 +105,16 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   pointer-events: none; 
 }
 
-/* ── BOTÓN INSTALAR ── */
+/* ── BOTÓN INSTALAR (Se oculta solo al estar instalada) ── */
 #install-btn {
   display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
   background: var(--text); color: var(--surface); padding: 16px 28px; border-radius: 100px;
   font-size: 15px; font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: none; cursor: pointer; align-items: center; gap: 10px; z-index: 1000;
+}
+
+/* Evita que en la app instalada se pueda hacer zoom accidental */
+@media (display-mode: standalone) {
+  body { user-select: none; -webkit-user-select: none; }
 }
 </style>
 </head>
@@ -114,7 +123,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 <div class="app">
   <header class="header">
     <div class="header-title">
-      <h1>Las Leñas</h1>
+      <!-- LOGO -->
+      <img src="logo.png" alt="Las Leñas" class="main-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <!-- Fallback si no hay imagen -->
+      <h1 style="display:none; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">Las Leñas</h1>
+      
       <div class="header-subtitle">
         <div class="dot"></div>
         <span>Actualizado <span id="utime">--:--</span></span>
@@ -166,7 +179,6 @@ function ajustarIframeUniversal() {
   if(viewport && scaler) {
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    // Valor actualizado a 615px en el javascript también
     viewport.style.height = (615 * scale) + 'px'; 
   }
 }
@@ -176,7 +188,11 @@ setTimeout(ajustarIframeUniversal, 50);
 // ── REGISTRO PWA ──
 if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(()=>{}); }); }
 let promptInstalacion; const btnInstalar = document.getElementById('install-btn');
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptInstalacion = e; btnInstalar.style.display = 'flex'; });
+window.addEventListener('beforeinstallprompt', (e) => { 
+  // Solo mostramos el botón si NO estamos en modo standalone (instalado)
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  e.preventDefault(); promptInstalacion = e; btnInstalar.style.display = 'flex'; 
+});
 btnInstalar.addEventListener('click', async () => { btnInstalar.style.display = 'none'; promptInstalacion.prompt(); await promptInstalacion.userChoice; promptInstalacion = null; });
 
 // ── PULL-TO-REFRESH ──
@@ -239,7 +255,9 @@ async function loadWeather() {
     
     const currTemp = Math.round(data.current.temperature_2m);
     const currIcon = codes[data.current.weather_code] || '⛅';
-    const snowTodayVal = data.daily.snowfall_sum[0];
+    
+    // REDONDEO DE NIEVE PARA HOY
+    const snowTodayVal = Math.round(data.daily.snowfall_sum[0]);
     const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
     
     let html = `<div class="weather-main"><div class="w-icon">${currIcon}</div><div><div class="w-temp">${currTemp}°</div><div class="w-desc">Sensación actual</div>${snowTodayHtml}</div></div><div class="weather-grid">`;
@@ -248,8 +266,11 @@ async function loadWeather() {
       const date = new Date(data.daily.time[i] + 'T12:00:00');
       const min = Math.round(data.daily.temperature_2m_min[i]);
       const max = Math.round(data.daily.temperature_2m_max[i]);
-      const snowVal = data.daily.snowfall_sum[i];
-      const snowText = snowVal > 0 ? `🌨️ ${snowVal}cm` : ``;
+      
+      // REDONDEO DE NIEVE PARA LOS PRÓXIMOS DÍAS
+      const snowVal = Math.round(data.daily.snowfall_sum[i]);
+      const snowText = snowVal > 0 ? `🌨️ ${snowVal} cm` : ``;
+      
       html += `<div><div class="wg-day">${i===1 ? 'Mañana' : days[date.getDay()]}</div><div class="wg-icon">${codes[data.daily.weather_code[i]] || '⛅'}</div><div class="wg-temps">${min}° / ${max}°</div><div class="wg-snow">${snowText}</div></div>`;
     }
     container.innerHTML = html + `</div>`;
