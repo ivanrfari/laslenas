@@ -3,12 +3,12 @@
   "short_name": "Las Leñas",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#fdfdfd",
-  "theme_color": "#ffffff",
+  "background_color": "#F2F4F8",
+  "theme_color": "#F2F4F8",
   "description": "Estado de rutas y clima en tiempo real.",
   "icons": [
     {
-      "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/26f0_fe0f/512.png",
+      "src": "./logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
