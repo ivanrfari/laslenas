@@ -8,8 +8,8 @@
   "description": "Estado de rutas y clima en tiempo real.",
   "icons": [
     {
-      "src": "./logo.png",
-      "sizes": "512x512",
+      "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/26f0_fe0f/512.png",
+      "sizes": "192x192 512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
