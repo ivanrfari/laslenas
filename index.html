@@ -21,7 +21,6 @@
   --text: #111827;
   --text-muted: #6B7280;
   --accent: #2563EB;
-  --accent-light: #EFF6FF;
   --green: #10B981;
   --green-light: #ECFDF5;
   --orange: #F59E0B;
@@ -57,7 +56,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.03); }
 .card-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 16px; }
 
-/* ── TARJETA RUTA ── */
+/* ── TARJETAS ── */
 .ruta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .ruta-name { font-size: 24px; font-weight: 800; }
 .ruta-chip { padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 700; }
@@ -66,7 +65,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .chip-danger { background: var(--red-light); color: var(--red); }
 .ruta-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); font-weight: 500; }
 
-/* ── TARJETA CLIMA ── */
 .weather-main { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #F3F4F6; }
 .w-icon { font-size: 42px; }
 .w-temp { font-size: 36px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
@@ -78,22 +76,37 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .wg-temps { font-size: 13px; font-weight: 700; color: var(--text-muted); }
 .wg-snow { font-size: 12px; font-weight: 800; color: var(--accent); margin-top: 6px; height: 16px; }
 
-/* ── LISTA NATIVA DE MEDIOS ── */
-.medios-list { display: flex; flex-direction: column; gap: 8px; }
-.medio-item { 
-  display: flex; justify-content: space-between; align-items: center; 
-  padding: 14px 18px; background: #F8FAFC; 
-  border: 1px solid #F1F5F9; border-radius: 16px; 
+/* ── MÁSCARA DE RECORTE UNIVERSAL ("IFRAME CONGELADO") ── */
+.iframe-viewport {
+  width: 100%; 
+  border-radius: var(--radius); 
+  overflow: hidden;
+  background: var(--surface); 
+  box-shadow: 0 8px 30px rgba(0,0,0,0.03);
+  position: relative;
+  /* La altura será calculada por Javascript para mantener la proporción exacta */
 }
-.medio-name { font-size: 15px; font-weight: 800; color: var(--text); }
-.medio-status { font-size: 18px; }
+.iframe-scaler {
+  width: 400px; /* Ancho simulado universal. Jamás cambia sin importar el celular. */
+  height: 1030px; /* ← AJUSTE 1: Cortar publicidades de ABAJO. Si ves la publicidad, bajá este número (ej: 1000px) */
+  position: relative;
+  transform-origin: top left;
+}
+.iframe-scaler iframe {
+  width: 400px; /* Obliga a la página a verse como en un celular de 400px */
+  height: 3000px;
+  position: absolute;
+  top: -710px; /* ← AJUSTE 2: Cortar bloque azul de ARRIBA. Si asoma el cartel azul, ponelo más negativo (ej: -720px) */
+  left: 0;
+  border: none; 
+  pointer-events: none; /* Bloquea clics accidentales */
+}
 
 /* ── BOTÓN INSTALAR ── */
 #install-btn {
   display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
   background: var(--text); color: var(--surface); padding: 16px 28px; border-radius: 100px;
-  font-size: 15px; font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  border: none; cursor: pointer; align-items: center; gap: 10px; z-index: 1000;
+  font-size: 15px; font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: none; cursor: pointer; align-items: center; gap: 10px; z-index: 1000;
 }
 </style>
 </head>
@@ -131,10 +144,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       </div>
     </div>
 
-    <div class="bento-card">
-      <div class="card-title">Medios de Elevación (En Vivo)</div>
-      <div id="medios-container">
-        <div style="text-align: center; color: var(--text-muted); font-weight: 700; padding: 20px 0;">Conectando con servidores...</div>
+    <!-- TARJETA DEL RECORTE CONGELADO -->
+    <div>
+      <div class="card-title" style="margin-left: 8px;">Estado de Medios (En vivo)</div>
+      <div class="iframe-viewport" id="iframe-viewport">
+        <div class="iframe-scaler" id="iframe-scaler">
+          <iframe id="m-iframe" src="https://laslenas.com/estado-pistas/medios/" scrolling="no"></iframe>
+        </div>
       </div>
     </div>
 
@@ -144,11 +160,29 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 <button id="install-btn"><span>📲</span> Instalar App</button>
 
 <script>
+// ── MOTOR DE ESCALADO UNIVERSAL ──
+// Esto hace que el recorte de 400px se agrande o se achique para calzar perfecto en la pantalla del usuario.
+function ajustarIframeUniversal() {
+  const viewport = document.getElementById('iframe-viewport');
+  const scaler = document.getElementById('iframe-scaler');
+  if(viewport && scaler) {
+    // Escala = Ancho de la pantalla real / 400px
+    const scale = viewport.clientWidth / 400;
+    scaler.style.transform = `scale(${scale})`;
+    // Adapta el alto del contenedor al nuevo tamaño escalado
+    viewport.style.height = (1030 * scale) + 'px'; // *NOTA: Si cambias el height del CSS, cambialo acá también.
+  }
+}
+window.addEventListener('resize', ajustarIframeUniversal);
+setTimeout(ajustarIframeUniversal, 50);
+
+// ── REGISTRO PWA ──
 if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(()=>{}); }); }
 let promptInstalacion; const btnInstalar = document.getElementById('install-btn');
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptInstalacion = e; btnInstalar.style.display = 'flex'; });
 btnInstalar.addEventListener('click', async () => { btnInstalar.style.display = 'none'; promptInstalacion.prompt(); await promptInstalacion.userChoice; promptInstalacion = null; });
 
+// ── PULL-TO-REFRESH ──
 const contentEl = document.getElementById('scroll-area');
 const rfIcon = document.getElementById('rf-icon');
 let startY = 0, currentY = 0, isPulling = false;
@@ -180,11 +214,14 @@ function setTime() {
 function refresh() {
   const ic = document.getElementById('rf-icon');
   ic.style.transition = ''; ic.classList.add('spinning');
-  loadWeather(); loadRouteStatus(); loadMediosLive();
+  loadWeather(); loadRouteStatus();
+  // Recarga el iframe original
+  const elIframe = document.getElementById('m-iframe');
+  elIframe.src = elIframe.src; 
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 1200);
 }
 
-// ── RUTAS ──
+// ── RUTAS Y CLIMA ──
 async function loadRouteStatus() {
   try {
     const res = await fetch('./estado.json?t=' + new Date().getTime());
@@ -197,7 +234,6 @@ async function loadRouteStatus() {
   } catch(e) { document.getElementById('txt-222').textContent = "Esperando la primera actualización..."; }
 }
 
-// ── CLIMA ──
 async function loadWeather() {
   const container = document.getElementById('wx-container');
   try {
@@ -224,91 +260,7 @@ async function loadWeather() {
   } catch(e) {}
 }
 
-// ── SISTEMA BLINDADO MULTI-PROXY PARA MEDIOS ──
-async function loadMediosLive() {
-  const container = document.getElementById('medios-container');
-  container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-weight: 700; padding: 20px 0;">Leyendo estado de pistas...</div>';
-  
-  const targetUrl = 'https://laslenas.com/estado-pistas/medios/';
-  
-  // Lista de escudos: Si Las Leñas bloquea uno, saltamos al siguiente instantáneamente
-  const proxies = [
-    `https://api.codetabs.com/v1/proxy?quest=${targetUrl}`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-    `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`
-  ];
-
-  let htmlData = null;
-
-  for (const proxy of proxies) {
-    try {
-      const response = await fetch(proxy, { cache: 'no-store' });
-      const text = await response.text();
-      // Verificamos si realmente nos devolvió el HTML de Las Leñas y no un bloqueo de Cloudflare
-      if (text.includes('medio__row--medio')) {
-        htmlData = text;
-        break; 
-      }
-    } catch (e) {
-      continue; // Falla silenciosamente y pasa al siguiente puente
-    }
-  }
-
-  try {
-    if (!htmlData) throw new Error("Firewall total");
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlData, 'text/html');
-    const filas = doc.querySelectorAll('.medios__row');
-    
-    if (filas.length === 0) throw new Error("Estructura rota");
-
-    let htmlList = '<div class="medios-list">';
-    filas.forEach(fila => {
-      const nombreEl = fila.querySelector('.medio__row--medio');
-      const estadoDiv = fila.querySelector('.medio__row--estado');
-      const imgEl = estadoDiv ? estadoDiv.querySelector('img') : null;
-      
-      if (nombreEl && imgEl) {
-        // Limpiamos los prefijos inútiles
-        let nombre = nombreEl.textContent.trim().replace(/^(Tk|Ts|T-bar|Telec|Teles)\s+/i, '');
-        
-        const src = imgEl.getAttribute('src').toLowerCase();
-        let icon = '❌'; 
-        
-        if (src.includes('abierta') || src.includes('abierto')) {
-          icon = '✅';
-        } else if (src.includes('condicional')) {
-          icon = '⚠️';
-        }
-        
-        htmlList += `
-          <div class="medio-item">
-            <span class="medio-name">${nombre}</span>
-            <span class="medio-status">${icon}</span>
-          </div>
-        `;
-      }
-    });
-    htmlList += '</div>';
-    container.innerHTML = htmlList;
-    
-  } catch (e) {
-    // FALLBACK ELEGANTE: Si los 3 proxies caen, mostramos un botón para ir a la oficial
-    container.innerHTML = `
-      <div style="text-align:center; padding: 15px 0;">
-        <p style="color: var(--text-muted); font-size: 14px; font-weight: 700; margin-bottom: 16px;">
-          El servidor de Las Leñas está bloqueando la lectura directa.
-        </p>
-        <a href="https://laslenas.com/estado-pistas/medios/" target="_blank" style="display:inline-flex; align-items:center; background:var(--accent-light); color:var(--accent); padding:12px 24px; border-radius:100px; text-decoration:none; font-weight:800; font-size:14px; box-shadow: 0 4px 15px rgba(37,99,235,0.1);">
-          Ver Pistas Oficiales ›
-        </a>
-      </div>
-    `;
-  }
-}
-
-setTime(); loadWeather(); loadRouteStatus(); loadMediosLive();
+setTime(); loadWeather(); loadRouteStatus();
 </script>
 </body>
 </html>
