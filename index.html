@@ -87,7 +87,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 }
 .iframe-scaler {
   width: 400px; 
-  height: 800px; /* VALOR EXACTO: Corta justo debajo del último medio de elevación */
+  height: 740px; /* VALOR EXACTO ACTUALIZADO: Cortado 60px más arriba para borrar los ads */
   position: relative;
   transform-origin: top left;
 }
@@ -95,7 +95,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   width: 400px; 
   height: 3000px;
   position: absolute;
-  top: -720px; /* VALOR EXACTO: Esconde el cuadro azul de arriba al milímetro */
+  top: -720px; 
   left: 0;
   border: none; 
   pointer-events: none; 
@@ -166,8 +166,8 @@ function ajustarIframeUniversal() {
   if(viewport && scaler) {
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    // Valor exacto de altura replicado acá: 800px
-    viewport.style.height = (800 * scale) + 'px'; 
+    // Valor actualizado a 740px para que coincida
+    viewport.style.height = (740 * scale) + 'px'; 
   }
 }
 window.addEventListener('resize', ajustarIframeUniversal);
