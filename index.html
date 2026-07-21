@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<!-- SOLUCIÓN ÍCONOS BLANCOS: Forzamos el tema a blanco puro para que Android ponga los íconos negros -->
-<meta name="theme-color" content="#FFFFFF">
+
+<!-- SOLUCIÓN DEFINITIVA HONOR: Pintamos la barra de estado de color oscuro puro para que los íconos blancos resalten perfecto -->
+<meta name="theme-color" content="#111827">
 <meta name="color-scheme" content="light">
 
 <title>Rutas — Las Leñas</title>
@@ -112,7 +113,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   font-size: 15px; font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: none; cursor: pointer; align-items: center; gap: 10px; z-index: 1000;
 }
 
-/* Evita que en la app instalada se pueda hacer zoom accidental */
 @media (display-mode: standalone) {
   body { user-select: none; -webkit-user-select: none; }
 }
@@ -123,9 +123,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 <div class="app">
   <header class="header">
     <div class="header-title">
-      <!-- LOGO -->
       <img src="logo.png" alt="Las Leñas" class="main-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <!-- Fallback si no hay imagen -->
       <h1 style="display:none; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">Las Leñas</h1>
       
       <div class="header-subtitle">
@@ -156,7 +154,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       </div>
     </div>
 
-    <!-- TARJETA DEL RECORTE CONGELADO -->
     <div>
       <div class="card-title" style="margin-left: 8px;">Estado de Medios (En vivo)</div>
       <div class="iframe-viewport" id="iframe-viewport">
@@ -172,7 +169,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 <button id="install-btn"><span>📲</span> Instalar App</button>
 
 <script>
-// ── MOTOR DE ESCALADO UNIVERSAL ──
 function ajustarIframeUniversal() {
   const viewport = document.getElementById('iframe-viewport');
   const scaler = document.getElementById('iframe-scaler');
@@ -185,17 +181,14 @@ function ajustarIframeUniversal() {
 window.addEventListener('resize', ajustarIframeUniversal);
 setTimeout(ajustarIframeUniversal, 50);
 
-// ── REGISTRO PWA ──
 if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(()=>{}); }); }
 let promptInstalacion; const btnInstalar = document.getElementById('install-btn');
 window.addEventListener('beforeinstallprompt', (e) => { 
-  // Solo mostramos el botón si NO estamos en modo standalone (instalado)
   if (window.matchMedia('(display-mode: standalone)').matches) return;
   e.preventDefault(); promptInstalacion = e; btnInstalar.style.display = 'flex'; 
 });
 btnInstalar.addEventListener('click', async () => { btnInstalar.style.display = 'none'; promptInstalacion.prompt(); await promptInstalacion.userChoice; promptInstalacion = null; });
 
-// ── PULL-TO-REFRESH ──
 const contentEl = document.getElementById('scroll-area');
 const rfIcon = document.getElementById('rf-icon');
 let startY = 0, currentY = 0, isPulling = false;
@@ -233,7 +226,6 @@ function refresh() {
   setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 1200);
 }
 
-// ── RUTAS Y CLIMA ──
 async function loadRouteStatus() {
   try {
     const res = await fetch('./estado.json?t=' + new Date().getTime());
@@ -256,8 +248,7 @@ async function loadWeather() {
     const currTemp = Math.round(data.current.temperature_2m);
     const currIcon = codes[data.current.weather_code] || '⛅';
     
-    // REDONDEO DE NIEVE PARA HOY
-    const snowTodayVal = Math.round(data.daily.snowfall_sum[0]);
+    const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
     const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
     
     let html = `<div class="weather-main"><div class="w-icon">${currIcon}</div><div><div class="w-temp">${currTemp}°</div><div class="w-desc">Sensación actual</div>${snowTodayHtml}</div></div><div class="weather-grid">`;
@@ -267,8 +258,7 @@ async function loadWeather() {
       const min = Math.round(data.daily.temperature_2m_min[i]);
       const max = Math.round(data.daily.temperature_2m_max[i]);
       
-      // REDONDEO DE NIEVE PARA LOS PRÓXIMOS DÍAS
-      const snowVal = Math.round(data.daily.snowfall_sum[i]);
+      const snowVal = Math.round(data.daily.snowfall_sum[i] || 0);
       const snowText = snowVal > 0 ? `🌨️ ${snowVal} cm` : ``;
       
       html += `<div><div class="wg-day">${i===1 ? 'Mañana' : days[date.getDay()]}</div><div class="wg-icon">${codes[data.daily.weather_code[i]] || '⛅'}</div><div class="wg-temps">${min}° / ${max}°</div><div class="wg-snow">${snowText}</div></div>`;
