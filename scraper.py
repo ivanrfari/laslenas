@@ -20,11 +20,7 @@ def actualizar_rutas():
         scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
         html_r = scraper.get(url_rutas).text
 
-    html_r = re.sub(r'<br\s*/?>', '\n', html_r)
     soup_r = BeautifulSoup(html_r, 'html.parser')
-    
-    texto_completo = soup_r.get_text(separator='\n', strip=True)
-    lineas = [l.strip() for l in texto_completo.split('\n') if l.strip()]
     
     datos = {
         "rp222": {"texto": "Sin datos actualizados", "tipo": "warn"}
@@ -32,22 +28,35 @@ def actualizar_rutas():
 
     nombres_ruta = ['RP 222', 'RUTA 222', 'RP222', 'R.P. 222', 'RUTA PROVINCIAL 222']
     
-    for linea in lineas:
-        upper_linea = linea.upper()
-        if any(nombre in upper_linea for nombre in nombres_ruta):
-            if len(linea) > 15:
-                if ". " in linea or "RUTA" in linea[15:].upper():
-                    oraciones = re.split(r'\.\s+', linea)
-                    for oracion in oraciones:
-                        if any(n in oracion.upper() for n in nombres_ruta):
-                            texto_final = oracion.strip()
-                            if not texto_final.endswith('.'): texto_final += '.'
-                            datos["rp222"]["texto"] = texto_final
-                            break
-                else:
-                    datos["rp222"]["texto"] = linea
-                break
+    # 1. Buscamos por bloques (viñetas y párrafos) en lugar de romper todo con saltos de línea
+    elementos = soup_r.find_all(['li', 'p'])
     
+    for el in elementos:
+        # Usamos espacio como separador para no romper las negritas
+        linea = el.get_text(separator=' ', strip=True) 
+        linea = re.sub(r'\s+', ' ', linea) # Limpiamos espacios dobles
+        upper_linea = linea.upper()
+        
+        # 2. Verificamos que sea la ruta a Las Leñas
+        if any(nombre in upper_linea for nombre in nombres_ruta) and "LAS LEÑAS" in upper_linea:
+            texto_final = linea
+            
+            # 3. Corte inteligente: Si hay dos puntos, nos quedamos con la explicación de la derecha
+            if ":" in texto_final:
+                partes = texto_final.split(":", 1)
+                if len(partes) > 1 and len(partes[1].strip()) > 5:
+                    texto_final = partes[1].strip()
+            
+            # Emprolijamos para que empiece con mayúscula y termine con punto
+            if texto_final:
+                texto_final = texto_final[0].upper() + texto_final[1:]
+            if not texto_final.endswith('.'): 
+                texto_final += '.'
+                
+            datos["rp222"]["texto"] = texto_final
+            break
+            
+    # 4. Asignación de colores (semáforo)
     texto_upper = datos["rp222"]["texto"].upper()
     if any(palabra in texto_upper for palabra in ['CORTAD', 'INTRANSITABLE', 'CERRAD']):
         datos["rp222"]["tipo"] = "danger"
