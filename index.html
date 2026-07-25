@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* ── VARIABLES DE COLOR (SOLO MODO CLARO) ── */
+/* ── VARIABLES DE COLOR ── */
 :root {
   --bg: #F4F6F9; 
   --surface: #FFFFFF;
@@ -47,7 +47,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 
 .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
 
-/* ── ENCABEZADO Y CONTROLES ── */
+/* ── ENCABEZADO ── */
 .header { 
   position: sticky; top: 0;
   background: var(--header-bg);
@@ -59,14 +59,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   z-index: 100;
 }
 .header-title { display: flex; flex-direction: column; justify-content: center; }
-.main-logo { height: 46px; object-fit: contain; margin-bottom: 2px; }
 
-/* NUEVO SUBTÍTULO GEOGRÁFICO */
-.header-geo {
-  font-size: 11px; font-weight: 800; color: var(--accent); 
-  text-transform: uppercase; letter-spacing: 0.5px; 
-  margin-bottom: 2px; margin-top: 2px;
-}
+/* NUEVO TÍTULO FUSIONADO CON LOGO */
+.title-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.main-logo { height: 22px; width: 22px; object-fit: contain; }
+.main-title { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; color: var(--text); text-transform: uppercase; margin: 0; }
 
 .header-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
@@ -102,9 +99,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .card-2 { animation-delay: 0.15s; }
 .card-3 { animation-delay: 0.25s; }
 
-.bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); }
+.bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); transition: all 0.5s ease; }
 .card-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.card-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
+.card-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; transition: all 0.5s ease; }
 
 /* ── TARJETAS ── */
 .ruta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -115,16 +112,48 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .chip-danger { background: var(--red-light); color: var(--red); }
 .ruta-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); font-weight: 500; }
 
-.weather-main { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--skeleton-1); }
+/* ── CLIMA (BASE Y CLASES) ── */
+.weather-main { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--skeleton-1); transition: border 0.5s ease; }
 .w-icon { font-size: 46px; }
-.w-temp { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; color: var(--text); }
-.w-desc { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-top: 4px; }
-.w-snow-today { font-size: 14px; font-weight: 800; color: var(--snow); margin-top: 6px; display: inline-block; background: var(--snow-bg); padding: 4px 10px; border-radius: 8px;}
+.w-temp { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; color: var(--text); transition: color 0.5s ease; }
+.w-desc { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-top: 6px; transition: color 0.5s ease; }
+.w-snow-today { font-size: 14px; font-weight: 800; color: var(--snow); margin-top: 8px; display: inline-block; background: var(--snow-bg); padding: 4px 10px; border-radius: 8px; transition: all 0.5s ease;}
 .weather-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
-.wg-day { font-size: 14px; font-weight: 800; color: var(--text); }
+.wg-day { font-size: 14px; font-weight: 800; color: var(--text); transition: color 0.5s ease; }
 .wg-icon { font-size: 22px; margin: 6px 0; }
-.wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); }
-.wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; }
+.wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); transition: color 0.5s ease; }
+.wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; transition: color 0.5s ease; }
+
+/* ── CLIMA INMERSIVO (TEMAS DINÁMICOS) ── */
+.immersive-card { position: relative; overflow: hidden; color: #FFFFFF !important; border: none !important; }
+.immersive-card::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.immersive-card > * { position: relative; z-index: 2; }
+.immersive-card .card-title, .immersive-card .w-temp, .immersive-card .wg-day, .immersive-card .wg-snow { color: #FFFFFF !important; }
+.immersive-card .card-title::before { background: #FFFFFF !important; }
+.immersive-card .w-desc, .immersive-card .wg-temps { color: rgba(255, 255, 255, 0.8) !important; }
+.immersive-card .w-snow-today { background: rgba(255, 255, 255, 0.2) !important; color: #FFFFFF !important; }
+.immersive-card .weather-main { border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+
+/* Tema: Nieve (Animación de copos puros en CSS) */
+.theme-snow { background: linear-gradient(135deg, #64748B 0%, #334155 100%); }
+.theme-snow::after {
+  background-image: radial-gradient(circle at 50% 50%, white 2px, transparent 2px),
+                    radial-gradient(circle at 20% 30%, white 1px, transparent 1px),
+                    radial-gradient(circle at 80% 80%, white 3px, transparent 3px);
+  background-size: 60px 60px, 30px 30px, 80px 80px;
+  animation: snowFall 6s linear infinite;
+}
+@keyframes snowFall {
+  0% { background-position: 0px 0px, 0px 0px, 0px 0px; }
+  100% { background-position: 60px 60px, 30px 60px, 80px 80px; }
+}
+
+/* Tema: Despejado (Resplandor soleado) */
+.theme-clear { background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%); }
+.theme-clear::after { background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.35) 0%, transparent 60%); }
+
+/* Tema: Nublado/Lluvia */
+.theme-clouds { background: linear-gradient(135deg, #94A3B8 0%, #475569 100%); }
 
 /* ── MÁSCARA IFRAME ── */
 .iframe-viewport { width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); position: relative; }
@@ -154,19 +183,19 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 <div class="app">
   <header class="header">
     <div class="header-title">
-      <img src="logo.png" alt="Las Leñas" class="main-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <h1 style="display:none; font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--text);">Las Leñas</h1>
+      <!-- Título principal limpio y sin redundancias -->
+      <div class="title-wrapper">
+        <img src="logo.png" alt="Logo" class="main-logo" onerror="this.style.display='none';">
+        <h1 class="main-title">Valle de Las Leñas • 2.240m</h1>
+      </div>
       
-      <!-- Detalle geográfico premium -->
-      <div class="header-geo">Valle de Las Leñas • 2.240m s.n.m.</div>
-
       <div class="header-subtitle">
         <div id="status-dot" class="dot live"></div>
         <span id="utime">Conectando...</span>
       </div>
     </div>
+    
     <div class="header-actions">
-      <!-- Se eliminó el botón de la luna/sol del modo oscuro -->
       <button class="btn-icon" onclick="refresh()">
         <span id="rf-icon">↻</span>
       </button>
@@ -184,7 +213,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       <div class="ruta-text skeleton" id="txt-222" style="min-height: 48px;">Cargando información...</div>
     </div>
 
-    <div class="bento-card anim-card card-2">
+    <!-- TARJETA DE CLIMA DINÁMICA -->
+    <div class="bento-card anim-card card-2" id="wx-card-bento">
       <div class="card-title">Pronóstico de la Montaña</div>
       <div id="wx-container" class="skeleton" style="min-height: 180px; width: 100%;">
         <div style="text-align: center; color: transparent; padding: 20px 0;">Cargando</div>
@@ -207,6 +237,37 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 <button id="install-btn"><span>📲</span> Instalar App Oficial</button>
 
 <script>
+// ── VARIABLES DE TIEMPO INTELIGENTE ──
+let lastUpdateDate = null;
+let isDataOffline = false;
+
+function updateTimeDisplay() {
+  if (!lastUpdateDate) return;
+  const dot = document.getElementById('status-dot');
+  const timeEl = document.getElementById('utime');
+
+  if (isDataOffline) {
+    timeEl.textContent = "Sin conexión (Caché)";
+    dot.className = 'dot offline';
+    return;
+  }
+
+  dot.className = 'dot live';
+  const diffMs = new Date() - lastUpdateDate;
+  const diffMins = Math.floor(diffMs / 60000);
+
+  let text = "";
+  if (diffMins < 1) text = "Actualizado hace un momento";
+  else if (diffMins === 1) text = "Actualizado hace 1 minuto";
+  else if (diffMins < 60) text = `Actualizado hace ${diffMins} minutos`;
+  else {
+    const diffHours = Math.floor(diffMins / 60);
+    text = diffHours === 1 ? "Actualizado hace 1 hora" : `Actualizado hace ${diffHours} horas`;
+  }
+  timeEl.textContent = text;
+}
+setInterval(updateTimeDisplay, 30000); // Revisa y actualiza el texto cada 30 segundos
+
 // ── TOAST NOTIFICATIONS ──
 let toastTimeout;
 function showToast(message) {
@@ -245,25 +306,13 @@ contentEl.addEventListener('touchstart', (e) => { if (contentEl.scrollTop === 0)
 contentEl.addEventListener('touchmove', (e) => { if (!isPulling) return; currentY = e.touches[0].clientY; const pullDist = currentY - startY; if (pullDist > 0 && contentEl.scrollTop === 0) { if (e.cancelable) e.preventDefault(); rfIcon.style.transform = `rotate(${pullDist * 2}deg)`; }}, {passive: false});
 contentEl.addEventListener('touchend', () => { if (!isPulling) return; isPulling = false; if (currentY - startY > 80) { rfIcon.style.transform = ''; refresh(); } else { rfIcon.style.transition = 'transform 0.3s ease-out'; rfIcon.style.transform = `rotate(0deg)`; }});
 
-function setTime(isOffline = false) {
-  const n = new Date();
-  const timeStr = `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
-  const dot = document.getElementById('status-dot');
-  if (isOffline) {
-    document.getElementById('utime').textContent = "Sin conexión (Mostrando caché)";
-    dot.className = 'dot offline';
-  } else {
-    document.getElementById('utime').textContent = `Actualizado ${timeStr}`;
-    dot.className = 'dot live';
-  }
-}
-
 function refresh() {
   const ic = document.getElementById('rf-icon');
   ic.style.transition = ''; ic.classList.add('spinning');
   
   document.getElementById('txt-222').classList.add('skeleton');
   document.getElementById('wx-container').classList.add('skeleton');
+  document.getElementById('wx-card-bento').className = 'bento-card anim-card card-2'; // Resetear fondo
   document.getElementById('wx-container').innerHTML = '';
 
   loadWeather(); 
@@ -291,27 +340,42 @@ async function loadRouteStatus() {
     const res = await fetch('./estado.json?t=' + new Date().getTime());
     if (!res.ok) throw new Error();
     const data = await res.json();
-    localStorage.setItem('cached_ruta', JSON.stringify(data)); // Guarda offline
+    localStorage.setItem('cached_ruta', JSON.stringify(data)); 
     renderRuta(data);
-    setTime(false);
+    isDataOffline = false; lastUpdateDate = new Date(); updateTimeDisplay();
   } catch(e) {
     const cached = localStorage.getItem('cached_ruta');
-    if (cached) { renderRuta(JSON.parse(cached)); setTime(true); showToast("⚠️ Sin internet. Mostrando ruta guardada."); } 
+    if (cached) { renderRuta(JSON.parse(cached)); isDataOffline = true; updateTimeDisplay(); showToast("⚠️ Sin internet. Mostrando ruta guardada."); } 
     else { document.getElementById('txt-222').textContent = "No hay datos guardados. Conectate a internet."; }
   }
 }
 
-// ── CLIMA CON CACHÉ OFFLINE ──
+// ── CLIMA (INMERSIVO Y PRO) ──
 function renderClima(data) {
   const container = document.getElementById('wx-container');
+  const cardBento = document.getElementById('wx-card-bento');
   const codes = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️', 71:'❄️', 73:'❄️', 75:'❄️', 77:'❄️', 80:'🌦️', 81:'🌦️', 82:'🌧️', 85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️' };
   
+  // Extraemos nuevos datos PRO
   const currTemp = Math.round(data.current.temperature_2m);
-  const currIcon = codes[data.current.weather_code] || '⛅';
+  const stTemp = Math.round(data.current.apparent_temperature);
+  const wind = Math.round(data.current.wind_speed_10m);
+  const wCode = data.current.weather_code;
+  const currIcon = codes[wCode] || '⛅';
+  
+  // Lógica de Tarjeta Inmersiva
+  let themeClass = 'theme-clouds';
+  if (wCode === 0 || wCode === 1) themeClass = 'theme-clear';
+  if ([71,73,75,77,85,86].includes(wCode)) themeClass = 'theme-snow';
+  
+  cardBento.className = `bento-card anim-card card-2 immersive-card ${themeClass}`;
+  
   const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
   const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
   
-  let html = `<div class="weather-main"><div class="w-icon">${currIcon}</div><div><div class="w-temp">${currTemp}°</div><div class="w-desc">Sensación actual</div>${snowTodayHtml}</div></div><div class="weather-grid">`;
+  // HTML Inyectando Sensación Térmica y Viento
+  let html = `<div class="weather-main"><div class="w-icon">${currIcon}</div><div><div class="w-temp">${currTemp}°</div><div class="w-desc">ST ${stTemp}° • 💨 Viento ${wind} km/h</div>${snowTodayHtml}</div></div><div class="weather-grid">`;
+  
   const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   for(let i=1; i<4; i++) {
     const date = new Date(data.daily.time[i] + 'T12:00:00');
@@ -327,11 +391,12 @@ function renderClima(data) {
 
 async function loadWeather() {
   try {
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
     if (!res.ok) throw new Error();
     const data = await res.json();
-    localStorage.setItem('cached_clima', JSON.stringify(data)); // Guarda offline
+    localStorage.setItem('cached_clima', JSON.stringify(data));
     renderClima(data);
+    isDataOffline = false; lastUpdateDate = new Date(); updateTimeDisplay();
   } catch(e) {
     const cached = localStorage.getItem('cached_clima');
     if (cached) renderClima(JSON.parse(cached));
