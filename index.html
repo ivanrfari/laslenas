@@ -115,7 +115,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .chip-danger { background: var(--red-light); color: var(--red); }
 .ruta-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); font-weight: 500; }
 
-/* ── CLIMA (DISEÑO MINIMALISTA PROFESIONAL) ── */
+/* ── CLIMA ── */
 .weather-main { 
   display: flex; flex-direction: column; align-items: center; justify-content: center; 
   text-align: center; gap: 4px; 
@@ -159,7 +159,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); }
 .wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; }
 
-/* ── MÁSCARA IFRAME (REDISEÑADA PARA ESTAR DENTRO DE LA TARJETA) ── */
+/* ── MÁSCARA IFRAME (RECORTE DEL ENCABEZADO AZUL) ── */
 .iframe-viewport { 
   width: 100%; border-radius: 16px; overflow: hidden; background: var(--surface); 
   position: relative; 
@@ -168,8 +168,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   content: ""; position: absolute; inset: 0; pointer-events: none;
   border: 6px solid var(--surface); border-radius: 16px;
 }
-.iframe-scaler { width: 400px; height: 640px; position: relative; transform-origin: top left; }
-.iframe-scaler iframe { width: 400px; height: 3000px; position: absolute; top: -720px; left: 0; border: none; pointer-events: none; }
+/* Recortamos 45px de arriba para ocultar el título azul interno y reducimos la altura a 595px */
+.iframe-scaler { width: 400px; height: 595px; position: relative; transform-origin: top left; }
+.iframe-scaler iframe { width: 400px; height: 3000px; position: absolute; top: -765px; left: 0; border: none; pointer-events: none; }
 
 /* ── TOAST NOTIFICATIONS ── */
 #toast {
@@ -223,6 +224,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       <div class="ruta-text skeleton" id="txt-222" style="min-height: 48px;">Cargando información...</div>
     </div>
 
+    <!-- TARJETA DE CLIMA -->
     <div class="bento-card anim-card card-2" id="wx-card-bento">
       <div class="card-title">Pronóstico de la Montaña</div>
       <div id="wx-container" class="skeleton" style="min-height: 280px; width: 100%;">
@@ -230,7 +232,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       </div>
     </div>
 
-    <!-- TARJETA DE MEDIOS (AHORA DENTRO DEL BENTO-CARD) -->
     <div class="bento-card anim-card card-3">
       <div class="card-title">Estado de Medios (En vivo)</div>
       <div class="iframe-viewport" id="iframe-viewport">
@@ -288,14 +289,14 @@ function showToast(message) {
   toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
 }
 
-// ── AJUSTE DE INTERFAZ ──
+// ── AJUSTE DE INTERFAZ (ACTUALIZADO A 595px) ──
 function ajustarIframeUniversal() {
   const viewport = document.getElementById('iframe-viewport');
   const scaler = document.getElementById('iframe-scaler');
   if(viewport && scaler) {
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    viewport.style.height = (640 * scale) + 'px'; 
+    viewport.style.height = (595 * scale) + 'px'; 
   }
 }
 window.addEventListener('resize', ajustarIframeUniversal);
