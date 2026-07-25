@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0B1B3F">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="light">
 
 <title>Rutas — Las Leñas</title>
 
@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* ── VARIABLES DE COLOR (Claro y Oscuro) ── */
+/* ── VARIABLES DE COLOR (SOLO MODO CLARO) ── */
 :root {
   --bg: #F4F6F9; 
   --surface: #FFFFFF;
@@ -42,29 +42,8 @@
   --safe-t: env(safe-area-inset-top, 0px);
 }
 
-/* TEMA OSCURO */
-[data-theme="dark"] {
-  --bg: #0B1120; 
-  --surface: #1E293B;
-  --text: #F8FAFC; 
-  --text-muted: #94A3B8;
-  --header-bg: rgba(11, 17, 32, 0.85);
-  --card-shadow: rgba(0, 0, 0, 0.3);
-  --card-border: rgba(255, 255, 255, 0.05);
-  --skeleton-1: #334155;
-  --skeleton-2: #475569;
-  
-  --accent-light: #331A00;
-  --snow: #38BDF8;
-  --snow-bg: #0C4A6E;
-  
-  --green-light: #064E3B; --green: #34D399;
-  --orange-light: #78350F; --orange: #FBBF24;
-  --red-light: #7F1D1D; --red: #F87171;
-}
-
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; touch-action: manipulation; }
-html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior-y: none; transition: background 0.3s, color 0.3s; }
+html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior-y: none; }
 
 .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
 
@@ -77,10 +56,18 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   display: flex; justify-content: space-between; align-items: center; 
   border-bottom: 3px solid rgba(255, 121, 0, 0.9); 
   box-shadow: 0 4px 30px var(--card-shadow);
-  z-index: 100; transition: background 0.3s;
+  z-index: 100;
 }
 .header-title { display: flex; flex-direction: column; justify-content: center; }
-.main-logo { height: 46px; object-fit: contain; margin-bottom: 4px; }
+.main-logo { height: 46px; object-fit: contain; margin-bottom: 2px; }
+
+/* NUEVO SUBTÍTULO GEOGRÁFICO */
+.header-geo {
+  font-size: 11px; font-weight: 800; color: var(--accent); 
+  text-transform: uppercase; letter-spacing: 0.5px; 
+  margin-bottom: 2px; margin-top: 2px;
+}
+
 .header-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
 .dot.live { animation: pulseLive 2s infinite; }
@@ -115,7 +102,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .card-2 { animation-delay: 0.15s; }
 .card-3 { animation-delay: 0.25s; }
 
-.bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); transition: background 0.3s, border 0.3s; }
+.bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); }
 .card-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .card-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
 
@@ -170,13 +157,16 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       <img src="logo.png" alt="Las Leñas" class="main-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
       <h1 style="display:none; font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--text);">Las Leñas</h1>
       
+      <!-- Detalle geográfico premium -->
+      <div class="header-geo">Valle de Las Leñas • 2.240m s.n.m.</div>
+
       <div class="header-subtitle">
         <div id="status-dot" class="dot live"></div>
         <span id="utime">Conectando...</span>
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn-icon" id="theme-btn" onclick="toggleTheme()">🌙</button>
+      <!-- Se eliminó el botón de la luna/sol del modo oscuro -->
       <button class="btn-icon" onclick="refresh()">
         <span id="rf-icon">↻</span>
       </button>
@@ -217,28 +207,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 <button id="install-btn"><span>📲</span> Instalar App Oficial</button>
 
 <script>
-// ── GESTIÓN DE TEMA (MODO OSCURO AUTOMÁTICO/MANUAL) ──
-function initTheme() {
-  const savedTheme = localStorage.getItem('theme_pref');
-  if (savedTheme) {
-    setTheme(savedTheme);
-  } else {
-    // Automático por hora: Luz de 08:00 a 19:00, Noche en otro horario
-    const hour = new Date().getHours();
-    setTheme((hour >= 8 && hour < 19) ? 'light' : 'dark');
-  }
-}
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
-  const newTheme = current === 'dark' ? 'light' : 'dark';
-  setTheme(newTheme);
-  localStorage.setItem('theme_pref', newTheme);
-}
-function setTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
-}
-
 // ── TOAST NOTIFICATIONS ──
 let toastTimeout;
 function showToast(message) {
@@ -371,7 +339,6 @@ async function loadWeather() {
 }
 
 // Inicializamos todo
-initTheme();
 loadWeather(); 
 loadRouteStatus();
 </script>
