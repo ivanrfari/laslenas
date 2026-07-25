@@ -23,7 +23,6 @@
   --surface: #FFFFFF;
   --text: #0B1B3F; 
   --text-muted: #5C6B8A;
-  /* Header azul marino 100% sólido para fusionarse con la barra de estado */
   --header-bg: #0B1B3F;
   --card-shadow: rgba(11, 27, 63, 0.06);
   --card-border: rgba(11, 27, 63, 0.03);
@@ -52,7 +51,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .header { 
   position: sticky; top: 0;
   background: var(--header-bg);
-  /* Se eliminó el efecto blur y transparencia para mantener color homogéneo */
   padding: calc(var(--safe-t) + 20px) 24px 16px; 
   display: flex; justify-content: space-between; align-items: center; 
   border-bottom: 3px solid var(--accent); 
@@ -161,14 +159,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); }
 .wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; }
 
-/* ── MÁSCARA IFRAME ── */
+/* ── MÁSCARA IFRAME (REDISEÑADA PARA ESTAR DENTRO DE LA TARJETA) ── */
 .iframe-viewport { 
-  width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--surface); 
-  box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); position: relative; 
+  width: 100%; border-radius: 16px; overflow: hidden; background: var(--surface); 
+  position: relative; 
 }
 .iframe-viewport::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  border: 10px solid var(--surface); border-radius: var(--radius);
+  border: 6px solid var(--surface); border-radius: 16px;
 }
 .iframe-scaler { width: 400px; height: 640px; position: relative; transform-origin: top left; }
 .iframe-scaler iframe { width: 400px; height: 3000px; position: absolute; top: -720px; left: 0; border: none; pointer-events: none; }
@@ -225,7 +223,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       <div class="ruta-text skeleton" id="txt-222" style="min-height: 48px;">Cargando información...</div>
     </div>
 
-    <!-- TARJETA DE CLIMA -->
     <div class="bento-card anim-card card-2" id="wx-card-bento">
       <div class="card-title">Pronóstico de la Montaña</div>
       <div id="wx-container" class="skeleton" style="min-height: 280px; width: 100%;">
@@ -233,8 +230,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       </div>
     </div>
 
-    <div class="anim-card card-3">
-      <div class="card-title" style="margin-left: 8px;">Estado de Medios (En vivo)</div>
+    <!-- TARJETA DE MEDIOS (AHORA DENTRO DEL BENTO-CARD) -->
+    <div class="bento-card anim-card card-3">
+      <div class="card-title">Estado de Medios (En vivo)</div>
       <div class="iframe-viewport" id="iframe-viewport">
         <div class="iframe-scaler" id="iframe-scaler">
           <iframe id="m-iframe" src="https://laslenas.com/estado-pistas/medios/" scrolling="no"></iframe>
