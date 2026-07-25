@@ -60,10 +60,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 }
 .header-title { display: flex; flex-direction: column; justify-content: center; }
 
-/* NUEVO TÍTULO FUSIONADO CON LOGO */
+/* TÍTULO FUSIONADO CON LOGO */
 .title-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .main-logo { height: 22px; width: 22px; object-fit: contain; }
-.main-title { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; color: var(--text); text-transform: uppercase; margin: 0; }
+.main-title { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; color: var(--text); text-transform: uppercase; margin: 0; }
 
 .header-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
@@ -99,9 +99,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .card-2 { animation-delay: 0.15s; }
 .card-3 { animation-delay: 0.25s; }
 
-.bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); transition: all 0.5s ease; }
+.bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); transition: background 0.5s ease, border-color 0.5s ease; }
 .card-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.card-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; transition: all 0.5s ease; }
+.card-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
+
+/* FONDOS PASTEL SUTILES PARA EL CLIMA */
+.bg-clear { background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); border-color: #BAE6FD; }
+.bg-clouds { background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); border-color: #E2E8F0; }
+.bg-snow { background: linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 100%); border-color: #E0F2FE; }
 
 /* ── TARJETAS ── */
 .ruta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -112,48 +117,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .chip-danger { background: var(--red-light); color: var(--red); }
 .ruta-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); font-weight: 500; }
 
-/* ── CLIMA (BASE Y CLASES) ── */
-.weather-main { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--skeleton-1); transition: border 0.5s ease; }
+/* ── CLIMA ── */
+.weather-main { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(11, 27, 63, 0.08); }
 .w-icon { font-size: 46px; }
-.w-temp { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; color: var(--text); transition: color 0.5s ease; }
-.w-desc { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-top: 6px; transition: color 0.5s ease; }
-.w-snow-today { font-size: 14px; font-weight: 800; color: var(--snow); margin-top: 8px; display: inline-block; background: var(--snow-bg); padding: 4px 10px; border-radius: 8px; transition: all 0.5s ease;}
+.w-temp { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; color: var(--text); }
+.w-desc { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-top: 6px; }
+.w-snow-today { font-size: 14px; font-weight: 800; color: var(--snow); margin-top: 8px; display: inline-block; background: rgba(2, 132, 199, 0.08); padding: 4px 10px; border-radius: 8px;}
 .weather-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
-.wg-day { font-size: 14px; font-weight: 800; color: var(--text); transition: color 0.5s ease; }
+.wg-day { font-size: 14px; font-weight: 800; color: var(--text); }
 .wg-icon { font-size: 22px; margin: 6px 0; }
-.wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); transition: color 0.5s ease; }
-.wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; transition: color 0.5s ease; }
-
-/* ── CLIMA INMERSIVO (TEMAS DINÁMICOS) ── */
-.immersive-card { position: relative; overflow: hidden; color: #FFFFFF !important; border: none !important; }
-.immersive-card::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-.immersive-card > * { position: relative; z-index: 2; }
-.immersive-card .card-title, .immersive-card .w-temp, .immersive-card .wg-day, .immersive-card .wg-snow { color: #FFFFFF !important; }
-.immersive-card .card-title::before { background: #FFFFFF !important; }
-.immersive-card .w-desc, .immersive-card .wg-temps { color: rgba(255, 255, 255, 0.8) !important; }
-.immersive-card .w-snow-today { background: rgba(255, 255, 255, 0.2) !important; color: #FFFFFF !important; }
-.immersive-card .weather-main { border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
-
-/* Tema: Nieve (Animación de copos puros en CSS) */
-.theme-snow { background: linear-gradient(135deg, #64748B 0%, #334155 100%); }
-.theme-snow::after {
-  background-image: radial-gradient(circle at 50% 50%, white 2px, transparent 2px),
-                    radial-gradient(circle at 20% 30%, white 1px, transparent 1px),
-                    radial-gradient(circle at 80% 80%, white 3px, transparent 3px);
-  background-size: 60px 60px, 30px 30px, 80px 80px;
-  animation: snowFall 6s linear infinite;
-}
-@keyframes snowFall {
-  0% { background-position: 0px 0px, 0px 0px, 0px 0px; }
-  100% { background-position: 60px 60px, 30px 60px, 80px 80px; }
-}
-
-/* Tema: Despejado (Resplandor soleado) */
-.theme-clear { background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%); }
-.theme-clear::after { background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.35) 0%, transparent 60%); }
-
-/* Tema: Nublado/Lluvia */
-.theme-clouds { background: linear-gradient(135deg, #94A3B8 0%, #475569 100%); }
+.wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); }
+.wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; }
 
 /* ── MÁSCARA IFRAME ── */
 .iframe-viewport { width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); position: relative; }
@@ -183,10 +157,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 <div class="app">
   <header class="header">
     <div class="header-title">
-      <!-- Título principal limpio y sin redundancias -->
       <div class="title-wrapper">
         <img src="logo.png" alt="Logo" class="main-logo" onerror="this.style.display='none';">
-        <h1 class="main-title">Valle de Las Leñas • 2.240m</h1>
+        <h1 class="main-title">Valle de Las Leñas • 2.240 m.s.n.m.</h1>
       </div>
       
       <div class="header-subtitle">
@@ -213,7 +186,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       <div class="ruta-text skeleton" id="txt-222" style="min-height: 48px;">Cargando información...</div>
     </div>
 
-    <!-- TARJETA DE CLIMA DINÁMICA -->
+    <!-- TARJETA DE CLIMA (Con clase base) -->
     <div class="bento-card anim-card card-2" id="wx-card-bento">
       <div class="card-title">Pronóstico de la Montaña</div>
       <div id="wx-container" class="skeleton" style="min-height: 180px; width: 100%;">
@@ -266,7 +239,7 @@ function updateTimeDisplay() {
   }
   timeEl.textContent = text;
 }
-setInterval(updateTimeDisplay, 30000); // Revisa y actualiza el texto cada 30 segundos
+setInterval(updateTimeDisplay, 30000);
 
 // ── TOAST NOTIFICATIONS ──
 let toastTimeout;
@@ -312,7 +285,7 @@ function refresh() {
   
   document.getElementById('txt-222').classList.add('skeleton');
   document.getElementById('wx-container').classList.add('skeleton');
-  document.getElementById('wx-card-bento').className = 'bento-card anim-card card-2'; // Resetear fondo
+  document.getElementById('wx-card-bento').className = 'bento-card anim-card card-2'; // Vuelve al color base
   document.getElementById('wx-container').innerHTML = '';
 
   loadWeather(); 
@@ -350,30 +323,28 @@ async function loadRouteStatus() {
   }
 }
 
-// ── CLIMA (INMERSIVO Y PRO) ──
+// ── CLIMA SUTIL Y PRO ──
 function renderClima(data) {
   const container = document.getElementById('wx-container');
   const cardBento = document.getElementById('wx-card-bento');
   const codes = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️', 71:'❄️', 73:'❄️', 75:'❄️', 77:'❄️', 80:'🌦️', 81:'🌦️', 82:'🌧️', 85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️' };
   
-  // Extraemos nuevos datos PRO
   const currTemp = Math.round(data.current.temperature_2m);
   const stTemp = Math.round(data.current.apparent_temperature);
   const wind = Math.round(data.current.wind_speed_10m);
   const wCode = data.current.weather_code;
   const currIcon = codes[wCode] || '⛅';
   
-  // Lógica de Tarjeta Inmersiva
-  let themeClass = 'theme-clouds';
-  if (wCode === 0 || wCode === 1) themeClass = 'theme-clear';
-  if ([71,73,75,77,85,86].includes(wCode)) themeClass = 'theme-snow';
+  // Fondo sutil según clima
+  let themeClass = 'bg-clouds';
+  if (wCode === 0 || wCode === 1) themeClass = 'bg-clear';
+  if ([71,73,75,77,85,86].includes(wCode)) themeClass = 'bg-snow';
   
-  cardBento.className = `bento-card anim-card card-2 immersive-card ${themeClass}`;
+  cardBento.className = `bento-card anim-card card-2 ${themeClass}`;
   
   const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
   const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
   
-  // HTML Inyectando Sensación Térmica y Viento
   let html = `<div class="weather-main"><div class="w-icon">${currIcon}</div><div><div class="w-temp">${currTemp}°</div><div class="w-desc">ST ${stTemp}° • 💨 Viento ${wind} km/h</div>${snowTodayHtml}</div></div><div class="weather-grid">`;
   
   const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
