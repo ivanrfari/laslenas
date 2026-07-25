@@ -23,8 +23,8 @@
   --surface: #FFFFFF;
   --text: #0B1B3F; 
   --text-muted: #5C6B8A;
-  /* El header ahora es azul marino translúcido */
-  --header-bg: rgba(11, 27, 63, 0.95);
+  /* Header azul marino 100% sólido para fusionarse con la barra de estado */
+  --header-bg: #0B1B3F;
   --card-shadow: rgba(11, 27, 63, 0.06);
   --card-border: rgba(11, 27, 63, 0.03);
   --skeleton-1: #E2E8F0;
@@ -52,7 +52,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .header { 
   position: sticky; top: 0;
   background: var(--header-bg);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  /* Se eliminó el efecto blur y transparencia para mantener color homogéneo */
   padding: calc(var(--safe-t) + 20px) 24px 16px; 
   display: flex; justify-content: space-between; align-items: center; 
   border-bottom: 3px solid var(--accent); 
@@ -62,17 +62,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .header-title { display: flex; flex-direction: column; justify-content: center; }
 .title-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .main-logo { height: 22px; width: 22px; object-fit: contain; }
-/* Título principal ahora es blanco */
 .main-title { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; color: #FFFFFF; text-transform: uppercase; margin: 0; }
 
-/* Subtítulos ajustados para leerse sobre fondo oscuro */
 .header-subtitle { font-size: 13px; color: #94A3B8; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
 .dot.live { animation: pulseLive 2s infinite; }
 .dot.offline { background: var(--red); animation: none; }
 
 .header-actions { display: flex; gap: 8px; }
-/* Botón rediseñado para fondo oscuro (Translúcido blanco) */
 .btn-icon {
   width: 42px; height: 42px; border-radius: 14px; 
   background: rgba(255, 255, 255, 0.1); border: none; 
@@ -365,13 +362,12 @@ async function loadRouteStatus() {
   }
 }
 
-// ── CLIMA SÚPER PRO (DISEÑO LIMPIO TIPO GRID) ──
+// ── CLIMA SÚPER PRO ──
 function renderClima(data) {
   const container = document.getElementById('wx-container');
   const cardBento = document.getElementById('wx-card-bento');
   const codes = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️', 71:'❄️', 73:'❄️', 75:'❄️', 77:'❄️', 80:'🌦️', 81:'🌦️', 82:'🌧️', 85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️' };
   
-  // Datos actuales
   const currTemp = Math.round(data.current.temperature_2m);
   const stTemp = Math.round(data.current.apparent_temperature);
   const wind = Math.round(data.current.wind_speed_10m);
@@ -382,7 +378,6 @@ function renderClima(data) {
   const wCode = data.current.weather_code;
   const currIcon = codes[wCode] || '⛅';
   
-  // Fondo pastel
   let themeClass = 'bg-clouds';
   if (wCode === 0 || wCode === 1) themeClass = 'bg-clear';
   if ([71,73,75,77,85,86].includes(wCode)) themeClass = 'bg-snow';
@@ -391,7 +386,6 @@ function renderClima(data) {
   const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
   const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
   
-  // Armado del Slider por horas
   let hourlyHtml = '<div class="hourly-container">';
   const currentHourPrefix = data.current.time.slice(0, 14);
   let startIndex = data.hourly.time.findIndex(t => t.startsWith(currentHourPrefix));
@@ -411,7 +405,6 @@ function renderClima(data) {
   }
   hourlyHtml += '</div>';
   
-  // Ensamblaje Final HTML con la nueva Grilla de Detalles sin emojis
   let html = `
     <div class="weather-main">
       <div class="w-icon">${currIcon}</div>
