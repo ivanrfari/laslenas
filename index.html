@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<!-- Mantenemos la barra azul oficial -->
 <meta name="theme-color" content="#0B1B3F">
 <meta name="color-scheme" content="light">
 
@@ -19,7 +18,7 @@
 
 <style>
 :root {
-  var(--bg): #F4F6F9; 
+  --bg: #F4F6F9; 
   --surface: #FFFFFF;
   --text: #0B1B3F; 
   --text-muted: #5C6B8A;
@@ -40,14 +39,14 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; touch-action: manipulation; }
 
-html, body { height: 100%; background: #F4F6F9; color: var(--text); overflow: hidden; overscroll-behavior-y: none; }
+html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior-y: none; }
 
-/* ── NUEVA ESTRUCTURA PARA EL EFECTO VIDRIO ── */
-.app { display: block; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
+/* Volvemos a la estructura Flex para evitar superposiciones */
+.app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
 
-/* ── ENCABEZADO GLASSMORPHISM (Efecto Vidrio) ── */
+/* ── ENCABEZADO GLASSMORPHISM CORREGIDO ── */
 .header { 
-  position: absolute; top: 0; left: 0; right: 0;
+  position: sticky; top: 0;
   background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -61,7 +60,6 @@ html, body { height: 100%; background: #F4F6F9; color: var(--text); overflow: hi
 .main-logo { height: 46px; object-fit: contain; margin-bottom: 4px; }
 .header-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
 
-/* Punto latente */
 .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulseLive 2s infinite; }
 
 .btn-refresh {
@@ -76,7 +74,7 @@ html, body { height: 100%; background: #F4F6F9; color: var(--text); overflow: hi
 @keyframes pulseLive { 0% { box-shadow: 0 0 0 0 rgba(255, 121, 0, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(255, 121, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 121, 0, 0); } }
 @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
 
-/* ── EFECTO SKELETON (Carga Fantasma) ── */
+/* ── EFECTO SKELETON ── */
 .skeleton {
   background: linear-gradient(90deg, #E2E8F0 25%, #F1F5F9 50%, #E2E8F0 75%);
   background-size: 200% 100%;
@@ -91,10 +89,9 @@ html, body { height: 100%; background: #F4F6F9; color: var(--text); overflow: hi
 
 /* ── CONTENIDO SCROLLABLE ── */
 .scroll-area { 
-  height: 100dvh; 
+  flex: 1;
   overflow-y: auto; 
-  /* Espacio extra arriba para que el primer bloque no quede abajo del vidrio */
-  padding: calc(var(--safe-t) + 115px) 20px 40px; 
+  padding: 20px 20px 40px; 
   display: flex; flex-direction: column; gap: 20px; 
 }
 
@@ -154,8 +151,7 @@ html, body { height: 100%; background: #F4F6F9; color: var(--text); overflow: hi
       
       <div class="header-subtitle">
         <div class="dot"></div>
-        <!-- ACÁ SE CARGA EL SALUDO DINÁMICO -->
-        <span id="utime">Conectando...</span>
+        <span>Actualizado <span id="utime">--:--</span></span>
       </div>
     </div>
     <button class="btn-refresh" onclick="refresh()">
@@ -171,14 +167,14 @@ html, body { height: 100%; background: #F4F6F9; color: var(--text); overflow: hi
         <div class="ruta-name">RP 222</div>
         <div class="ruta-chip chip-warn" id="chip-222">...</div>
       </div>
-      <!-- Aplicamos clase SKELETON inicial -->
+      <!-- Ajuste con min-height para que no se desborde -->
       <div class="ruta-text skeleton" id="txt-222" style="min-height: 48px;">Cargando información...</div>
     </div>
 
     <div class="bento-card anim-card card-2">
       <div class="card-title">Pronóstico de la Montaña</div>
-      <!-- Contenedor Clima SKELETON inicial -->
-      <div id="wx-container" class="skeleton" style="height: 180px; width: 100%;">
+      <!-- Ajuste con min-height para que no empuje el resto al cargar -->
+      <div id="wx-container" class="skeleton" style="min-height: 180px; width: 100%;">
         <div style="text-align: center; color: transparent; padding: 20px 0;">Cargando</div>
       </div>
     </div>
@@ -198,14 +194,6 @@ html, body { height: 100%; background: #F4F6F9; color: var(--text); overflow: hi
 <button id="install-btn"><span>📲</span> Instalar App Oficial</button>
 
 <script>
-// ── EFECTO HÁPTICO (VIBRACIÓN INTENSA) ──
-function triggerVibration() {
-  if (navigator.vibrate) {
-    // Patrón fuerte: Vibra 150ms, pausa 40ms, vibra 150ms (Golpe doble estilo consola)
-    navigator.vibrate([150, 40, 150]); 
-  }
-}
-
 function ajustarIframeUniversal() {
   const viewport = document.getElementById('iframe-viewport');
   const scaler = document.getElementById('iframe-scaler');
@@ -225,7 +213,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault(); promptInstalacion = e; btnInstalar.style.display = 'flex'; 
 });
 btnInstalar.addEventListener('click', async () => { 
-  triggerVibration(); // Vibra al tocar instalar
   btnInstalar.style.display = 'none'; promptInstalacion.prompt(); await promptInstalacion.userChoice; promptInstalacion = null; 
 });
 
@@ -255,26 +242,16 @@ contentEl.addEventListener('touchend', () => {
   else { rfIcon.style.transition = 'transform 0.3s ease-out'; rfIcon.style.transform = `rotate(0deg)`; }
 });
 
-// ── SALUDO DINÁMICO (Sin nombre) ──
 function setTime() {
   const n = new Date();
-  const h = n.getHours();
-  
-  let saludo = "🌙 Buenas noches";
-  if (h >= 6 && h < 12) saludo = "☀️ Buenos días";
-  else if (h >= 12 && h < 20) saludo = "🌤️ Buenas tardes";
-
-  const timeStr = `${String(h).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
-  document.getElementById('utime').innerHTML = `${saludo} &bull; Actualizado ${timeStr}`;
+  const timeStr = `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('utime').textContent = timeStr;
 }
 
 function refresh() {
-  triggerVibration(); // Vibra al tocar el botón de recargar
-  
   const ic = document.getElementById('rf-icon');
   ic.style.transition = ''; ic.classList.add('spinning');
   
-  // Reactivamos los Skeletons visualmente mientras carga
   document.getElementById('txt-222').classList.add('skeleton');
   document.getElementById('wx-container').classList.add('skeleton');
   document.getElementById('wx-container').innerHTML = '';
@@ -295,7 +272,6 @@ async function loadRouteStatus() {
     const chip = document.getElementById('chip-222');
     const txtEl = document.getElementById('txt-222');
     
-    // Apagamos el skeleton y mostramos el texto real
     txtEl.classList.remove('skeleton');
     txtEl.textContent = data.rp222.texto;
     
@@ -331,7 +307,6 @@ async function loadWeather() {
       html += `<div><div class="wg-day">${i===1 ? 'Mañana' : days[date.getDay()]}</div><div class="wg-icon">${codes[data.daily.weather_code[i]] || '⛅'}</div><div class="wg-temps">${min}° / ${max}°</div><div class="wg-snow">${snowText}</div></div>`;
     }
     
-    // Apagamos el skeleton y mostramos la tarjeta terminada
     container.classList.remove('skeleton');
     container.innerHTML = html + `</div>`;
   } catch(e) {}
