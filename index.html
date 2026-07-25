@@ -108,7 +108,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .bg-clouds { background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); border-color: #E2E8F0; }
 .bg-snow { background: linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 100%); border-color: #E0F2FE; }
 
-/* ── TARJETAS ── */
+/* ── TARJETAS DE RUTAS ── */
 .ruta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .ruta-name { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
 .ruta-chip { padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 700; transition: all 0.3s; }
@@ -117,20 +117,36 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .chip-danger { background: var(--red-light); color: var(--red); }
 .ruta-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); font-weight: 500; }
 
-/* ── CLIMA ── */
-.weather-main { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(11, 27, 63, 0.08); }
-.w-icon { font-size: 46px; }
-.w-temp { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; color: var(--text); }
-.w-desc { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-top: 6px; }
-.w-snow-today { font-size: 14px; font-weight: 800; color: var(--snow); margin-top: 8px; display: inline-block; background: rgba(2, 132, 199, 0.08); padding: 4px 10px; border-radius: 8px;}
+/* ── CLIMA (REDISEÑO CENTRADO PREMIUM) ── */
+.weather-main { 
+  display: flex; flex-direction: column; align-items: center; justify-content: center; 
+  text-align: center; gap: 6px; margin-bottom: 24px; padding-bottom: 24px; 
+  border-bottom: 1px solid rgba(11, 27, 63, 0.08); 
+}
+.w-icon { font-size: 54px; line-height: 1; margin-bottom: 4px; }
+.w-temp { font-size: 48px; font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); }
+.w-desc { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-top: 4px; }
+.w-snow-today { 
+  font-size: 14px; font-weight: 800; color: var(--snow); margin-top: 8px; 
+  display: inline-block; background: rgba(2, 132, 199, 0.08); 
+  padding: 6px 16px; border-radius: 12px;
+}
 .weather-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
 .wg-day { font-size: 14px; font-weight: 800; color: var(--text); }
 .wg-icon { font-size: 22px; margin: 6px 0; }
 .wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); }
 .wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; }
 
-/* ── MÁSCARA IFRAME ── */
-.iframe-viewport { width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); position: relative; }
+/* ── MÁSCARA IFRAME (CON MARCO INTERIOR) ── */
+.iframe-viewport { 
+  width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--surface); 
+  box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); position: relative; 
+}
+/* Este pseudo-elemento dibuja un borde blanco grueso por encima para redondear forzosamente las esquinas rectas de la tabla azul */
+.iframe-viewport::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border: 10px solid var(--surface); border-radius: var(--radius);
+}
 .iframe-scaler { width: 400px; height: 615px; position: relative; transform-origin: top left; }
 .iframe-scaler iframe { width: 400px; height: 3000px; position: absolute; top: -720px; left: 0; border: none; pointer-events: none; }
 
@@ -189,7 +205,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
     <!-- TARJETA DE CLIMA (Con clase base) -->
     <div class="bento-card anim-card card-2" id="wx-card-bento">
       <div class="card-title">Pronóstico de la Montaña</div>
-      <div id="wx-container" class="skeleton" style="min-height: 180px; width: 100%;">
+      <div id="wx-container" class="skeleton" style="min-height: 220px; width: 100%;">
         <div style="text-align: center; color: transparent; padding: 20px 0;">Cargando</div>
       </div>
     </div>
@@ -285,7 +301,7 @@ function refresh() {
   
   document.getElementById('txt-222').classList.add('skeleton');
   document.getElementById('wx-container').classList.add('skeleton');
-  document.getElementById('wx-card-bento').className = 'bento-card anim-card card-2'; // Vuelve al color base
+  document.getElementById('wx-card-bento').className = 'bento-card anim-card card-2'; 
   document.getElementById('wx-container').innerHTML = '';
 
   loadWeather(); 
@@ -323,7 +339,7 @@ async function loadRouteStatus() {
   }
 }
 
-// ── CLIMA SUTIL Y PRO ──
+// ── CLIMA SUTIL Y PRO (ESTRUCTURA CENTRADA) ──
 function renderClima(data) {
   const container = document.getElementById('wx-container');
   const cardBento = document.getElementById('wx-card-bento');
@@ -345,7 +361,15 @@ function renderClima(data) {
   const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
   const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
   
-  let html = `<div class="weather-main"><div class="w-icon">${currIcon}</div><div><div class="w-temp">${currTemp}°</div><div class="w-desc">ST ${stTemp}° • 💨 Viento ${wind} km/h</div>${snowTodayHtml}</div></div><div class="weather-grid">`;
+  // Modificado para apilarse en el centro sin el <div> intermedio
+  let html = `
+    <div class="weather-main">
+      <div class="w-icon">${currIcon}</div>
+      <div class="w-temp">${currTemp}°</div>
+      <div class="w-desc">ST ${stTemp}° • 💨 Viento ${wind} km/h</div>
+      ${snowTodayHtml}
+    </div>
+    <div class="weather-grid">`;
   
   const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   for(let i=1; i<4; i++) {
