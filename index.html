@@ -137,7 +137,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); }
 .wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; }
 
-/* ── MÁSCARA IFRAME (AJUSTADA A 680px) ── */
+/* ── MÁSCARA IFRAME (AJUSTADA A 640px EXACTOS) ── */
 .iframe-viewport { 
   width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--surface); 
   box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); position: relative; 
@@ -146,7 +146,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   content: ""; position: absolute; inset: 0; pointer-events: none;
   border: 10px solid var(--surface); border-radius: var(--radius);
 }
-.iframe-scaler { width: 400px; height: 680px; position: relative; transform-origin: top left; }
+.iframe-scaler { width: 400px; height: 640px; position: relative; transform-origin: top left; }
 .iframe-scaler iframe { width: 400px; height: 3000px; position: absolute; top: -720px; left: 0; border: none; pointer-events: none; }
 
 /* ── TOAST NOTIFICATIONS ── */
@@ -273,8 +273,8 @@ function ajustarIframeUniversal() {
   if(viewport && scaler) {
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    // AUMENTAMOS A 680px PARA QUE NO CORTE EL ÚLTIMO MEDIO
-    viewport.style.height = (680 * scale) + 'px'; 
+    // REAJUSTADO A 640px EXACTOS
+    viewport.style.height = (640 * scale) + 'px'; 
   }
 }
 window.addEventListener('resize', ajustarIframeUniversal);
