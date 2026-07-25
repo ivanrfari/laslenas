@@ -59,8 +59,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   z-index: 100;
 }
 .header-title { display: flex; flex-direction: column; justify-content: center; }
-
-/* TÍTULO FUSIONADO CON LOGO */
 .title-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .main-logo { height: 22px; width: 22px; object-fit: contain; }
 .main-title { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; color: var(--text); text-transform: uppercase; margin: 0; }
@@ -117,24 +115,36 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .chip-danger { background: var(--red-light); color: var(--red); }
 .ruta-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); font-weight: 500; }
 
-/* ── CLIMA (SÚPER PRO) ── */
+/* ── CLIMA (DISEÑO MINIMALISTA PROFESIONAL) ── */
 .weather-main { 
   display: flex; flex-direction: column; align-items: center; justify-content: center; 
-  text-align: center; gap: 4px; margin-bottom: 24px; 
+  text-align: center; gap: 4px; 
 }
 .w-icon { font-size: 54px; line-height: 1; margin-bottom: 4px; }
 .w-temp { font-size: 48px; font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); }
-.w-desc { font-size: 13px; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
+.w-desc { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
 .w-snow-today { 
   font-size: 14px; font-weight: 800; color: var(--snow); margin-top: 10px; 
   display: inline-block; background: rgba(2, 132, 199, 0.08); 
   padding: 6px 16px; border-radius: 12px;
 }
 
+/* GRILLA DE DETALLES (NUEVO DISEÑO SIN EMOJIS) */
+.weather-details {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  margin: 20px 0 24px; padding: 18px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.6);
+  text-align: left;
+}
+.wd-item { display: flex; flex-direction: column; gap: 2px; }
+.wd-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.wd-value { font-size: 14px; font-weight: 800; color: var(--text); }
+
 /* HORAS SLIDER */
 .hourly-container { 
   display: flex; overflow-x: auto; justify-content: space-between; gap: 12px; 
-  padding: 0 4px 20px 4px; margin-bottom: 20px; 
+  padding: 0 4px 24px 4px; margin-bottom: 24px; 
   border-bottom: 1px solid rgba(11, 27, 63, 0.08); scrollbar-width: none; 
 }
 .hourly-container::-webkit-scrollbar { display: none; }
@@ -149,7 +159,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); }
 .wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; }
 
-/* ── MÁSCARA IFRAME (AJUSTADA A 640px EXACTOS) ── */
+/* ── MÁSCARA IFRAME ── */
 .iframe-viewport { 
   width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--surface); 
   box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); position: relative; 
@@ -285,7 +295,7 @@ function ajustarIframeUniversal() {
   if(viewport && scaler) {
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    viewport.style.height = (640 * scale) + 'px'; // 640px exactos para ocultar el logo de abajo
+    viewport.style.height = (640 * scale) + 'px'; 
   }
 }
 window.addEventListener('resize', ajustarIframeUniversal);
@@ -350,7 +360,7 @@ async function loadRouteStatus() {
   }
 }
 
-// ── CLIMA SÚPER PRO (CON LÍNEA DE TIEMPO) ──
+// ── CLIMA SÚPER PRO (DISEÑO LIMPIO TIPO GRID) ──
 function renderClima(data) {
   const container = document.getElementById('wx-container');
   const cardBento = document.getElementById('wx-card-bento');
@@ -376,9 +386,9 @@ function renderClima(data) {
   const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
   const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
   
-  // Armado del Slider por horas (Próximas 5 horas)
+  // Armado del Slider por horas
   let hourlyHtml = '<div class="hourly-container">';
-  const currentHourPrefix = data.current.time.slice(0, 14); // Busca la hora actual
+  const currentHourPrefix = data.current.time.slice(0, 14);
   let startIndex = data.hourly.time.findIndex(t => t.startsWith(currentHourPrefix));
   if(startIndex === -1) startIndex = 0;
   
@@ -396,22 +406,38 @@ function renderClima(data) {
   }
   hourlyHtml += '</div>';
   
-  // Ensamblaje Final HTML
+  // Ensamblaje Final HTML con la nueva Grilla de Detalles sin emojis
   let html = `
     <div class="weather-main">
       <div class="w-icon">${currIcon}</div>
       <div class="w-temp">${currTemp}°</div>
-      <div class="w-desc">ST ${stTemp}° • 💨 ${wind} km/h</div>
-      <div class="w-desc">☀️ UV ${uv} • 👁️ Visibilidad ${vis} km</div>
-      <div class="w-desc" style="margin-top: 4px;">🌅 ${sunrise} • 🌇 ${sunset}</div>
+      <div class="w-desc">Sensación térmica ${stTemp}°</div>
       ${snowTodayHtml}
+    </div>
+    
+    <div class="weather-details">
+      <div class="wd-item">
+        <span class="wd-label">Viento</span>
+        <span class="wd-value">${wind} km/h</span>
+      </div>
+      <div class="wd-item">
+        <span class="wd-label">Visibilidad</span>
+        <span class="wd-value">${vis} km</span>
+      </div>
+      <div class="wd-item">
+        <span class="wd-label">Índice UV</span>
+        <span class="wd-value">${uv}</span>
+      </div>
+      <div class="wd-item">
+        <span class="wd-label">Luz Solar</span>
+        <span class="wd-value">${sunrise} - ${sunset}</span>
+      </div>
     </div>
     
     ${hourlyHtml}
     
     <div class="weather-grid">`;
   
-  // Grilla de los próximos 3 días
   const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   for(let i=1; i<4; i++) {
     const date = new Date(data.daily.time[i] + 'T12:00:00');
@@ -428,7 +454,6 @@ function renderClima(data) {
 
 async function loadWeather() {
   try {
-    // API hiper-completa
     const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,visibility&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,uv_index_max,sunrise,sunset&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
     if (!res.ok) throw new Error();
     const data = await res.json();
