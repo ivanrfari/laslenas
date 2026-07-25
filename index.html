@@ -168,8 +168,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   content: ""; position: absolute; inset: 0; pointer-events: none;
   border: 6px solid var(--surface); border-radius: 16px;
 }
-/* Recortamos el título azul subiendo el iframe a -775px y achicando la altura a 585px */
-.iframe-scaler { width: 400px; height: 585px; position: relative; transform-origin: top left; }
+/* Recorte de 10px extra: Altura exacta a 575px */
+.iframe-scaler { width: 400px; height: 575px; position: relative; transform-origin: top left; }
 .iframe-scaler iframe { width: 400px; height: 3000px; position: absolute; top: -775px; left: 0; border: none; pointer-events: none; }
 
 /* ── TOAST NOTIFICATIONS ── */
@@ -296,7 +296,8 @@ function ajustarIframeUniversal() {
   if(viewport && scaler) {
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    viewport.style.height = (585 * scale) + 'px'; 
+    // Ajustado a 575px para borrar esos 10 píxeles rebeldes
+    viewport.style.height = (575 * scale) + 'px'; 
   }
 }
 window.addEventListener('resize', ajustarIframeUniversal);
