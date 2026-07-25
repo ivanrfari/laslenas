@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0B1B3F">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
 
 <title>Rutas — Las Leñas</title>
 
@@ -17,58 +17,83 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 
 <style>
+/* ── VARIABLES DE COLOR (Claro y Oscuro) ── */
 :root {
   --bg: #F4F6F9; 
   --surface: #FFFFFF;
   --text: #0B1B3F; 
   --text-muted: #5C6B8A;
+  --header-bg: rgba(255, 255, 255, 0.85);
+  --card-shadow: rgba(11, 27, 63, 0.06);
+  --card-border: rgba(11, 27, 63, 0.03);
+  --skeleton-1: #E2E8F0;
+  --skeleton-2: #F1F5F9;
+  
   --accent: #FF7900; 
   --accent-light: #FFF4EB;
   --snow: #0284C7; 
+  --snow-bg: #F0F9FF;
   
-  --green: #059669;
-  --green-light: #ECFDF5;
-  --orange: #D97706;
-  --orange-light: #FFFBEB;
-  --red: #DC2626;
-  --red-light: #FEF2F2;
+  --green: #059669; --green-light: #ECFDF5;
+  --orange: #D97706; --orange-light: #FFFBEB;
+  --red: #DC2626; --red-light: #FEF2F2;
   
   --radius: 24px;
   --safe-t: env(safe-area-inset-top, 0px);
 }
 
+/* TEMA OSCURO */
+[data-theme="dark"] {
+  --bg: #0B1120; 
+  --surface: #1E293B;
+  --text: #F8FAFC; 
+  --text-muted: #94A3B8;
+  --header-bg: rgba(11, 17, 32, 0.85);
+  --card-shadow: rgba(0, 0, 0, 0.3);
+  --card-border: rgba(255, 255, 255, 0.05);
+  --skeleton-1: #334155;
+  --skeleton-2: #475569;
+  
+  --accent-light: #331A00;
+  --snow: #38BDF8;
+  --snow-bg: #0C4A6E;
+  
+  --green-light: #064E3B; --green: #34D399;
+  --orange-light: #78350F; --orange: #FBBF24;
+  --red-light: #7F1D1D; --red: #F87171;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; touch-action: manipulation; }
+html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior-y: none; transition: background 0.3s, color 0.3s; }
 
-html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior-y: none; }
-
-/* Volvemos a la estructura Flex para evitar superposiciones */
 .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
 
-/* ── ENCABEZADO GLASSMORPHISM CORREGIDO ── */
+/* ── ENCABEZADO Y CONTROLES ── */
 .header { 
   position: sticky; top: 0;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--header-bg);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   padding: calc(var(--safe-t) + 20px) 24px 16px; 
   display: flex; justify-content: space-between; align-items: center; 
   border-bottom: 3px solid rgba(255, 121, 0, 0.9); 
-  box-shadow: 0 4px 30px rgba(11, 27, 63, 0.08);
-  z-index: 100;
+  box-shadow: 0 4px 30px var(--card-shadow);
+  z-index: 100; transition: background 0.3s;
 }
 .header-title { display: flex; flex-direction: column; justify-content: center; }
 .main-logo { height: 46px; object-fit: contain; margin-bottom: 4px; }
 .header-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+.dot.live { animation: pulseLive 2s infinite; }
+.dot.offline { background: var(--red); animation: none; }
 
-.dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulseLive 2s infinite; }
-
-.btn-refresh {
-  width: 48px; height: 48px; border-radius: 16px; background: var(--accent-light); border: none; 
-  display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent); cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
+.header-actions { display: flex; gap: 8px; }
+.btn-icon {
+  width: 42px; height: 42px; border-radius: 14px; background: var(--accent-light); border: none; 
+  display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--accent); cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
 }
-.btn-refresh:active { transform: scale(0.9); background: #FFE4CC; }
-#rf-icon { transition: transform 0.1s ease-out; }
+.btn-icon:active { transform: scale(0.9); }
+#rf-icon { transition: transform 0.1s ease-out; font-size: 20px; }
 .spinning { animation: spin 0.6s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulseLive { 0% { box-shadow: 0 0 0 0 rgba(255, 121, 0, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(255, 121, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 121, 0, 0); } }
@@ -76,31 +101,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 
 /* ── EFECTO SKELETON ── */
 .skeleton {
-  background: linear-gradient(90deg, #E2E8F0 25%, #F1F5F9 50%, #E2E8F0 75%);
-  background-size: 200% 100%;
-  animation: skeletonLoading 1.5s infinite;
-  border-radius: 12px;
-  color: transparent !important;
-  user-select: none;
-  pointer-events: none;
+  background: linear-gradient(90deg, var(--skeleton-1) 25%, var(--skeleton-2) 50%, var(--skeleton-1) 75%);
+  background-size: 200% 100%; animation: skeletonLoading 1.5s infinite; border-radius: 12px;
+  color: transparent !important; user-select: none; pointer-events: none;
 }
 .skeleton * { visibility: hidden; }
 @keyframes skeletonLoading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-/* ── CONTENIDO SCROLLABLE ── */
-.scroll-area { 
-  flex: 1;
-  overflow-y: auto; 
-  padding: 20px 20px 40px; 
-  display: flex; flex-direction: column; gap: 20px; 
-}
-
+/* ── CONTENIDO ── */
+.scroll-area { flex: 1; overflow-y: auto; padding: 20px 20px 40px; display: flex; flex-direction: column; gap: 20px; }
 .anim-card { opacity: 0; animation: slideUpFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 .card-1 { animation-delay: 0.05s; }
 .card-2 { animation-delay: 0.15s; }
 .card-3 { animation-delay: 0.25s; }
 
-.bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 10px 30px -5px rgba(11, 27, 63, 0.06); border: 1px solid rgba(11, 27, 63, 0.03); }
+.bento-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); transition: background 0.3s, border 0.3s; }
 .card-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .card-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
 
@@ -113,31 +128,37 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .chip-danger { background: var(--red-light); color: var(--red); }
 .ruta-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); font-weight: 500; }
 
-.weather-main { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }
+.weather-main { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--skeleton-1); }
 .w-icon { font-size: 46px; }
 .w-temp { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; color: var(--text); }
 .w-desc { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-top: 4px; }
-.w-snow-today { font-size: 14px; font-weight: 800; color: var(--snow); margin-top: 6px; display: inline-block; background: #F0F9FF; padding: 4px 10px; border-radius: 8px;}
+.w-snow-today { font-size: 14px; font-weight: 800; color: var(--snow); margin-top: 6px; display: inline-block; background: var(--snow-bg); padding: 4px 10px; border-radius: 8px;}
 .weather-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
 .wg-day { font-size: 14px; font-weight: 800; color: var(--text); }
 .wg-icon { font-size: 22px; margin: 6px 0; }
 .wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); }
 .wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; }
 
-/* ── MÁSCARA DE RECORTE ── */
-.iframe-viewport { width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 10px 30px -5px rgba(11, 27, 63, 0.06); border: 1px solid rgba(11, 27, 63, 0.03); position: relative; }
+/* ── MÁSCARA IFRAME ── */
+.iframe-viewport { width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 10px 30px -5px var(--card-shadow); border: 1px solid var(--card-border); position: relative; }
 .iframe-scaler { width: 400px; height: 615px; position: relative; transform-origin: top left; }
 .iframe-scaler iframe { width: 400px; height: 3000px; position: absolute; top: -720px; left: 0; border: none; pointer-events: none; }
+
+/* ── TOAST NOTIFICATIONS ── */
+#toast {
+  position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
+  background: #111827; color: #FFFFFF; padding: 14px 24px; border-radius: 100px;
+  font-size: 14px; font-weight: 700; transition: bottom 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 2000; white-space: nowrap; pointer-events: none;
+}
+#toast.show { bottom: 40px; }
 
 /* ── BOTÓN INSTALAR ── */
 #install-btn {
   display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-  background: var(--text); color: var(--surface); padding: 16px 32px; border-radius: 100px;
-  font-size: 16px; font-weight: 800; box-shadow: 0 10px 25px rgba(11, 27, 63, 0.3); border: none; border-bottom: 4px solid #050D1F; cursor: pointer; align-items: center; gap: 10px; z-index: 1000;
-  transition: transform 0.2s;
+  background: var(--accent); color: #FFF; padding: 16px 32px; border-radius: 100px;
+  font-size: 16px; font-weight: 800; box-shadow: 0 10px 25px rgba(255, 121, 0, 0.4); border: none; cursor: pointer; align-items: center; gap: 10px; z-index: 1000;
 }
-#install-btn:active { transform: translate(-50%, 4px); border-bottom: 0px; margin-bottom: 4px; }
-
 @media (display-mode: standalone) { body { user-select: none; -webkit-user-select: none; } }
 </style>
 </head>
@@ -150,13 +171,16 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
       <h1 style="display:none; font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--text);">Las Leñas</h1>
       
       <div class="header-subtitle">
-        <div class="dot"></div>
-        <span>Actualizado <span id="utime">--:--</span></span>
+        <div id="status-dot" class="dot live"></div>
+        <span id="utime">Conectando...</span>
       </div>
     </div>
-    <button class="btn-refresh" onclick="refresh()">
-      <span id="rf-icon">↻</span>
-    </button>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-btn" onclick="toggleTheme()">🌙</button>
+      <button class="btn-icon" onclick="refresh()">
+        <span id="rf-icon">↻</span>
+      </button>
+    </div>
   </header>
 
   <div class="scroll-area" id="scroll-area">
@@ -167,13 +191,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
         <div class="ruta-name">RP 222</div>
         <div class="ruta-chip chip-warn" id="chip-222">...</div>
       </div>
-      <!-- Ajuste con min-height para que no se desborde -->
       <div class="ruta-text skeleton" id="txt-222" style="min-height: 48px;">Cargando información...</div>
     </div>
 
     <div class="bento-card anim-card card-2">
       <div class="card-title">Pronóstico de la Montaña</div>
-      <!-- Ajuste con min-height para que no empuje el resto al cargar -->
       <div id="wx-container" class="skeleton" style="min-height: 180px; width: 100%;">
         <div style="text-align: center; color: transparent; padding: 20px 0;">Cargando</div>
       </div>
@@ -191,9 +213,43 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   </div>
 </div>
 
+<div id="toast"></div>
 <button id="install-btn"><span>📲</span> Instalar App Oficial</button>
 
 <script>
+// ── GESTIÓN DE TEMA (MODO OSCURO AUTOMÁTICO/MANUAL) ──
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme_pref');
+  if (savedTheme) {
+    setTheme(savedTheme);
+  } else {
+    // Automático por hora: Luz de 08:00 a 19:00, Noche en otro horario
+    const hour = new Date().getHours();
+    setTheme((hour >= 8 && hour < 19) ? 'light' : 'dark');
+  }
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const newTheme = current === 'dark' ? 'light' : 'dark';
+  setTheme(newTheme);
+  localStorage.setItem('theme_pref', newTheme);
+}
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+// ── TOAST NOTIFICATIONS ──
+let toastTimeout;
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ── AJUSTE DE INTERFAZ ──
 function ajustarIframeUniversal() {
   const viewport = document.getElementById('iframe-viewport');
   const scaler = document.getElementById('iframe-scaler');
@@ -212,40 +268,26 @@ window.addEventListener('beforeinstallprompt', (e) => {
   if (window.matchMedia('(display-mode: standalone)').matches) return;
   e.preventDefault(); promptInstalacion = e; btnInstalar.style.display = 'flex'; 
 });
-btnInstalar.addEventListener('click', async () => { 
-  btnInstalar.style.display = 'none'; promptInstalacion.prompt(); await promptInstalacion.userChoice; promptInstalacion = null; 
-});
+btnInstalar.addEventListener('click', async () => { btnInstalar.style.display = 'none'; promptInstalacion.prompt(); await promptInstalacion.userChoice; promptInstalacion = null; });
 
 const contentEl = document.getElementById('scroll-area');
 const rfIcon = document.getElementById('rf-icon');
 let startY = 0, currentY = 0, isPulling = false;
+contentEl.addEventListener('touchstart', (e) => { if (contentEl.scrollTop === 0) { startY = e.touches[0].clientY; isPulling = true; rfIcon.style.transition = 'none'; }}, {passive: true});
+contentEl.addEventListener('touchmove', (e) => { if (!isPulling) return; currentY = e.touches[0].clientY; const pullDist = currentY - startY; if (pullDist > 0 && contentEl.scrollTop === 0) { if (e.cancelable) e.preventDefault(); rfIcon.style.transform = `rotate(${pullDist * 2}deg)`; }}, {passive: false});
+contentEl.addEventListener('touchend', () => { if (!isPulling) return; isPulling = false; if (currentY - startY > 80) { rfIcon.style.transform = ''; refresh(); } else { rfIcon.style.transition = 'transform 0.3s ease-out'; rfIcon.style.transform = `rotate(0deg)`; }});
 
-contentEl.addEventListener('touchstart', (e) => {
-  if (contentEl.scrollTop === 0) { startY = e.touches[0].clientY; isPulling = true; rfIcon.style.transition = 'none'; }
-}, {passive: true});
-contentEl.addEventListener('touchmove', (e) => {
-  if (!isPulling) return;
-  currentY = e.touches[0].clientY;
-  const pullDist = currentY - startY;
-  if (pullDist > 0 && contentEl.scrollTop === 0) {
-    if (e.cancelable) e.preventDefault();
-    rfIcon.style.transform = `rotate(${pullDist * 2}deg)`;
-  }
-}, {passive: false});
-contentEl.addEventListener('touchend', () => {
-  if (!isPulling) return;
-  isPulling = false;
-  if (currentY - startY > 80) { 
-    rfIcon.style.transform = ''; 
-    refresh(); 
-  } 
-  else { rfIcon.style.transition = 'transform 0.3s ease-out'; rfIcon.style.transform = `rotate(0deg)`; }
-});
-
-function setTime() {
+function setTime(isOffline = false) {
   const n = new Date();
   const timeStr = `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
-  document.getElementById('utime').textContent = timeStr;
+  const dot = document.getElementById('status-dot');
+  if (isOffline) {
+    document.getElementById('utime').textContent = "Sin conexión (Mostrando caché)";
+    dot.className = 'dot offline';
+  } else {
+    document.getElementById('utime').textContent = `Actualizado ${timeStr}`;
+    dot.className = 'dot live';
+  }
 }
 
 function refresh() {
@@ -262,57 +304,76 @@ function refresh() {
   const elIframe = document.getElementById('m-iframe');
   elIframe.src = elIframe.src; 
   
-  setTimeout(() => { ic.classList.remove('spinning'); setTime(); }, 1200);
+  setTimeout(() => { ic.classList.remove('spinning'); }, 1200);
+}
+
+// ── RUTAS CON CACHÉ OFFLINE ──
+function renderRuta(data) {
+  const chip = document.getElementById('chip-222');
+  const txtEl = document.getElementById('txt-222');
+  txtEl.classList.remove('skeleton');
+  txtEl.textContent = data.rp222.texto;
+  if (data.rp222.tipo === 'danger') { chip.className = 'ruta-chip chip-danger'; chip.textContent = 'Cerrada'; } 
+  else if (data.rp222.tipo === 'warn') { chip.className = 'ruta-chip chip-warn'; chip.textContent = 'Cadenas / Precaución'; } 
+  else { chip.className = 'ruta-chip chip-ok'; chip.textContent = 'Transitable'; }
 }
 
 async function loadRouteStatus() {
   try {
     const res = await fetch('./estado.json?t=' + new Date().getTime());
+    if (!res.ok) throw new Error();
     const data = await res.json();
-    const chip = document.getElementById('chip-222');
-    const txtEl = document.getElementById('txt-222');
-    
-    txtEl.classList.remove('skeleton');
-    txtEl.textContent = data.rp222.texto;
-    
-    if (data.rp222.tipo === 'danger') { chip.className = 'ruta-chip chip-danger'; chip.textContent = 'Cerrada'; } 
-    else if (data.rp222.tipo === 'warn') { chip.className = 'ruta-chip chip-warn'; chip.textContent = 'Cadenas / Precaución'; } 
-    else { chip.className = 'ruta-chip chip-ok'; chip.textContent = 'Transitable'; }
-  } catch(e) {}
+    localStorage.setItem('cached_ruta', JSON.stringify(data)); // Guarda offline
+    renderRuta(data);
+    setTime(false);
+  } catch(e) {
+    const cached = localStorage.getItem('cached_ruta');
+    if (cached) { renderRuta(JSON.parse(cached)); setTime(true); showToast("⚠️ Sin internet. Mostrando ruta guardada."); } 
+    else { document.getElementById('txt-222').textContent = "No hay datos guardados. Conectate a internet."; }
+  }
+}
+
+// ── CLIMA CON CACHÉ OFFLINE ──
+function renderClima(data) {
+  const container = document.getElementById('wx-container');
+  const codes = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️', 71:'❄️', 73:'❄️', 75:'❄️', 77:'❄️', 80:'🌦️', 81:'🌦️', 82:'🌧️', 85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️' };
+  
+  const currTemp = Math.round(data.current.temperature_2m);
+  const currIcon = codes[data.current.weather_code] || '⛅';
+  const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
+  const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
+  
+  let html = `<div class="weather-main"><div class="w-icon">${currIcon}</div><div><div class="w-temp">${currTemp}°</div><div class="w-desc">Sensación actual</div>${snowTodayHtml}</div></div><div class="weather-grid">`;
+  const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  for(let i=1; i<4; i++) {
+    const date = new Date(data.daily.time[i] + 'T12:00:00');
+    const min = Math.round(data.daily.temperature_2m_min[i]);
+    const max = Math.round(data.daily.temperature_2m_max[i]);
+    const snowVal = Math.round(data.daily.snowfall_sum[i] || 0);
+    const snowText = snowVal > 0 ? `🌨️ ${snowVal} cm` : ``;
+    html += `<div><div class="wg-day">${i===1 ? 'Mañana' : days[date.getDay()]}</div><div class="wg-icon">${codes[data.daily.weather_code[i]] || '⛅'}</div><div class="wg-temps">${min}° / ${max}°</div><div class="wg-snow">${snowText}</div></div>`;
+  }
+  container.classList.remove('skeleton');
+  container.innerHTML = html + `</div>`;
 }
 
 async function loadWeather() {
-  const container = document.getElementById('wx-container');
   try {
     const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
+    if (!res.ok) throw new Error();
     const data = await res.json();
-    const codes = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️', 71:'❄️', 73:'❄️', 75:'❄️', 77:'❄️', 80:'🌦️', 81:'🌦️', 82:'🌧️', 85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️' };
-    
-    const currTemp = Math.round(data.current.temperature_2m);
-    const currIcon = codes[data.current.weather_code] || '⛅';
-    
-    const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
-    const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
-    
-    let html = `<div class="weather-main"><div class="w-icon">${currIcon}</div><div><div class="w-temp">${currTemp}°</div><div class="w-desc">Sensación actual</div>${snowTodayHtml}</div></div><div class="weather-grid">`;
-    const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    for(let i=1; i<4; i++) {
-      const date = new Date(data.daily.time[i] + 'T12:00:00');
-      const min = Math.round(data.daily.temperature_2m_min[i]);
-      const max = Math.round(data.daily.temperature_2m_max[i]);
-      
-      const snowVal = Math.round(data.daily.snowfall_sum[i] || 0);
-      const snowText = snowVal > 0 ? `🌨️ ${snowVal} cm` : ``;
-      
-      html += `<div><div class="wg-day">${i===1 ? 'Mañana' : days[date.getDay()]}</div><div class="wg-icon">${codes[data.daily.weather_code[i]] || '⛅'}</div><div class="wg-temps">${min}° / ${max}°</div><div class="wg-snow">${snowText}</div></div>`;
-    }
-    
-    container.classList.remove('skeleton');
-    container.innerHTML = html + `</div>`;
-  } catch(e) {}
+    localStorage.setItem('cached_clima', JSON.stringify(data)); // Guarda offline
+    renderClima(data);
+  } catch(e) {
+    const cached = localStorage.getItem('cached_clima');
+    if (cached) renderClima(JSON.parse(cached));
+  }
 }
 
-setTime(); loadWeather(); loadRouteStatus();
+// Inicializamos todo
+initTheme();
+loadWeather(); 
+loadRouteStatus();
 </script>
 </body>
 </html>
