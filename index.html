@@ -131,7 +131,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 
 /* GRILLA DE DETALLES */
 .weather-details {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px;
   margin: 20px 0 24px; padding: 18px;
   background: rgba(255, 255, 255, 0.45);
   border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.6);
@@ -152,6 +152,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .h-time { font-size: 12px; font-weight: 800; color: var(--text-muted); }
 .h-icon { font-size: 24px; }
 .h-temp { font-size: 14px; font-weight: 800; color: var(--text); }
+.h-pop { font-size: 12px; font-weight: 800; color: var(--snow); margin-top: -2px; }
 
 .weather-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
 .wg-day { font-size: 14px; font-weight: 800; color: var(--text); }
@@ -159,7 +160,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .wg-temps { font-size: 14px; font-weight: 700; color: var(--text-muted); }
 .wg-snow { font-size: 13px; font-weight: 800; color: var(--snow); margin-top: 6px; height: 16px; }
 
-/* ── MÁSCARA IFRAME CORREGIDA ── */
+/* ── MÁSCARA IFRAME ── */
 .iframe-viewport { 
   width: 100%; border-radius: 16px; overflow: hidden; background: var(--surface); 
   position: relative; 
@@ -168,7 +169,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   content: ""; position: absolute; inset: 0; pointer-events: none;
   border: 6px solid var(--surface); border-radius: 16px;
 }
-/* Recorte de 10px extra: Altura exacta a 575px */
 .iframe-scaler { width: 400px; height: 575px; position: relative; transform-origin: top left; }
 .iframe-scaler iframe { width: 400px; height: 3000px; position: absolute; top: -775px; left: 0; border: none; pointer-events: none; }
 
@@ -227,7 +227,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
     <!-- TARJETA DE CLIMA -->
     <div class="bento-card anim-card card-2" id="wx-card-bento">
       <div class="card-title">Pronóstico de la Montaña</div>
-      <div id="wx-container" class="skeleton" style="min-height: 280px; width: 100%;">
+      <div id="wx-container" class="skeleton" style="min-height: 380px; width: 100%;">
         <div style="text-align: center; color: transparent; padding: 20px 0;">Cargando</div>
       </div>
     </div>
@@ -296,7 +296,6 @@ function ajustarIframeUniversal() {
   if(viewport && scaler) {
     const scale = viewport.clientWidth / 400;
     scaler.style.transform = `scale(${scale})`;
-    // Ajustado a 575px para borrar esos 10 píxeles rebeldes
     viewport.style.height = (575 * scale) + 'px'; 
   }
 }
@@ -362,16 +361,19 @@ async function loadRouteStatus() {
   }
 }
 
-// ── CLIMA SÚPER PRO ──
+// ── CLIMA SÚPER PRO (CON RÁFAGAS, POP Y BASE DE NIEVE) ──
 function renderClima(data) {
   const container = document.getElementById('wx-container');
   const cardBento = document.getElementById('wx-card-bento');
   const codes = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️', 71:'❄️', 73:'❄️', 75:'❄️', 77:'❄️', 80:'🌦️', 81:'🌦️', 82:'🌧️', 85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️' };
   
+  // Extraemos nuevos datos
   const currTemp = Math.round(data.current.temperature_2m);
   const stTemp = Math.round(data.current.apparent_temperature);
   const wind = Math.round(data.current.wind_speed_10m);
+  const gusts = Math.round(data.current.wind_gusts_10m || wind);
   const vis = Math.round((data.current.visibility || 0) / 1000);
+  const snowDepth = (data.current.snow_depth !== undefined && data.current.snow_depth !== null) ? Math.round(data.current.snow_depth * 100) : 0;
   const uv = Math.round(data.daily.uv_index_max[0] || 0);
   const sunrise = data.daily.sunrise[0].split('T')[1];
   const sunset = data.daily.sunset[0].split('T')[1];
@@ -386,6 +388,7 @@ function renderClima(data) {
   const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
   const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
   
+  // Slider por horas con Probabilidad de Precipitación
   let hourlyHtml = '<div class="hourly-container">';
   const currentHourPrefix = data.current.time.slice(0, 14);
   let startIndex = data.hourly.time.findIndex(t => t.startsWith(currentHourPrefix));
@@ -396,11 +399,15 @@ function renderClima(data) {
     const hTime = data.hourly.time[i].split('T')[1];
     const hCode = data.hourly.weather_code[i];
     const hTemp = Math.round(data.hourly.temperature_2m[i]);
+    const pop = data.hourly.precipitation_probability[i] || 0;
+    const popHtml = pop > 0 ? `<div class="h-pop">${pop}%</div>` : '';
+    
     hourlyHtml += `
       <div class="hourly-item">
         <div class="h-time">${hTime}</div>
         <div class="h-icon">${codes[hCode] || '⛅'}</div>
         <div class="h-temp">${hTemp}°</div>
+        ${popHtml}
       </div>`;
   }
   hourlyHtml += '</div>';
@@ -416,7 +423,11 @@ function renderClima(data) {
     <div class="weather-details">
       <div class="wd-item">
         <span class="wd-label">Viento</span>
-        <span class="wd-value">${wind} km/h</span>
+        <span class="wd-value">${wind} km/h <span style="font-size:11px; color:var(--text-muted); font-weight:700;">(Ráf. ${gusts})</span></span>
+      </div>
+      <div class="wd-item">
+        <span class="wd-label">Base de Nieve</span>
+        <span class="wd-value">${snowDepth} cm</span>
       </div>
       <div class="wd-item">
         <span class="wd-label">Visibilidad</span>
@@ -426,7 +437,7 @@ function renderClima(data) {
         <span class="wd-label">Índice UV</span>
         <span class="wd-value">${uv}</span>
       </div>
-      <div class="wd-item">
+      <div class="wd-item" style="grid-column: span 2; border-top: 1px solid rgba(11,27,63,0.06); padding-top: 14px; margin-top: 4px; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
         <span class="wd-label">Luz Solar</span>
         <span class="wd-value">${sunrise} - ${sunset}</span>
       </div>
@@ -452,7 +463,8 @@ function renderClima(data) {
 
 async function loadWeather() {
   try {
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,visibility&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,uv_index_max,sunrise,sunset&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
+    // API actualizada para incluir ráfagas, base de nieve y pop por hora
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-35.1448&longitude=-70.0813&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_gusts_10m,visibility,snow_depth&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,uv_index_max,sunrise,sunset&timezone=America%2FArgentina%2FMendoza&forecast_days=4');
     if (!res.ok) throw new Error();
     const data = await res.json();
     localStorage.setItem('cached_clima', JSON.stringify(data));
