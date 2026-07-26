@@ -60,7 +60,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
 .header-title { display: flex; flex-direction: column; justify-content: center; }
 .title-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .main-logo { height: 22px; width: 22px; object-fit: contain; }
-.main-title { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; color: #FFFFFF; text-transform: uppercase; margin: 0; }
+/* Tamaño aumentado a 18px y texto ajustado */
+.main-title { font-size: 18px; font-weight: 800; letter-spacing: 0.5px; color: #FFFFFF; text-transform: uppercase; margin: 0; }
 
 .header-subtitle { font-size: 13px; color: #94A3B8; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
@@ -197,7 +198,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
     <div class="header-title">
       <div class="title-wrapper">
         <img src="logo.png" alt="Logo" class="main-logo" onerror="this.style.display='none';">
-        <h1 class="main-title">Valle de Las Leñas • 2.240 m.s.n.m.</h1>
+        <h1 class="main-title">Valle de Las Leñas</h1>
       </div>
       
       <div class="header-subtitle">
@@ -321,7 +322,6 @@ contentEl.addEventListener('touchstart', (e) => {
   startY = e.touches[0].clientY; 
   currentY = startY;
   
-  // Detecta si estamos tocando el límite superior o inferior
   isPullingTop = contentEl.scrollTop <= 0;
   isPullingBottom = contentEl.scrollTop + contentEl.clientHeight >= contentEl.scrollHeight - 1;
   
@@ -333,17 +333,15 @@ contentEl.addEventListener('touchmove', (e) => {
   currentY = e.touches[0].clientY; 
   const deltaY = currentY - startY; 
   
-  // Tirando hacia abajo desde el tope (Pull to refresh)
   if (isPullingTop && deltaY > 0) { 
     if (e.cancelable) e.preventDefault(); 
-    const resistance = deltaY * 0.35; // Nivel de elasticidad
+    const resistance = deltaY * 0.35; 
     contentEl.style.transform = `translateY(${resistance}px)`;
     rfIcon.style.transform = `rotate(${deltaY * 1.5}deg)`; 
   } 
-  // Tirando hacia arriba desde el fondo (Rebote inferior)
   else if (isPullingBottom && deltaY < 0) {
     if (e.cancelable) e.preventDefault();
-    const resistance = deltaY * 0.35; // Nivel de elasticidad invertido
+    const resistance = deltaY * 0.35; 
     contentEl.style.transform = `translateY(${resistance}px)`;
   }
 }, {passive: false});
@@ -351,11 +349,9 @@ contentEl.addEventListener('touchmove', (e) => {
 contentEl.addEventListener('touchend', () => { 
   const deltaY = currentY - startY; 
   
-  // Restaurar con animación elástica suave
   contentEl.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
   contentEl.style.transform = 'translateY(0px)';
   
-  // Verificar si tiró lo suficiente para recargar
   if (isPullingTop && deltaY > 80) { 
     rfIcon.style.transform = ''; 
     refresh(); 
@@ -418,7 +414,6 @@ function renderClima(data) {
   const cardBento = document.getElementById('wx-card-bento');
   const codes = { 0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'🌧️', 63:'🌧️', 65:'🌧️', 71:'❄️', 73:'❄️', 75:'❄️', 77:'❄️', 80:'🌦️', 81:'🌦️', 82:'🌧️', 85:'❄️', 86:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️' };
   
-  // Extraemos nuevos datos
   const currTemp = Math.round(data.current.temperature_2m);
   const stTemp = Math.round(data.current.apparent_temperature);
   const wind = Math.round(data.current.wind_speed_10m);
@@ -439,7 +434,6 @@ function renderClima(data) {
   const snowTodayVal = Math.round(data.daily.snowfall_sum[0] || 0);
   const snowTodayHtml = snowTodayVal > 0 ? `<div class="w-snow-today">🌨️ ${snowTodayVal} cm hoy</div>` : '';
   
-  // Slider por horas con Probabilidad de Precipitación
   let hourlyHtml = '<div class="hourly-container">';
   const currentHourPrefix = data.current.time.slice(0, 14);
   let startIndex = data.hourly.time.findIndex(t => t.startsWith(currentHourPrefix));
