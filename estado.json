@@ -1,6 +1,6 @@
 {
   "rp222": {
-    "texto": "Uso obligatorio de cadenas en RP 222 a Las Leñas.",
-    "tipo": "warn"
+    "texto": "Act2: RP 89 Vallecitos: Solo 4×4 y uso obligatorio de cadenas hasta Guardaparques; Potrerillos: habilitados con precaución todos los caminos de villas de montaña para todo tipo de vehículos luego de que Vialidad Mendoza despejara los caminos. RP 52 : transitable hasta Agua de los Pajaritos. RP 94 Manzano Histórico : habilitado con precaución para todo tipo de vehículos, despejo DPV. RP 222 : uso obligatorio de cadenas a Las Leñas. Intransitables: RP 89 en tramo La Carrera, y tramo de Vallecitos de Guardaparques a la cima, máquinas trabajando. RP 86 tramo Los Cerrillos, RP 52 , tramos asfaltado de Agua de los Pajaritos a Hotel Villavicencio y tramo de suelo natural de Villavicencio a Uspallata, RP 220 El Sosneado, RN 143 Pareditas – San Rafael.",
+    "tipo": "danger"
   }
 }
